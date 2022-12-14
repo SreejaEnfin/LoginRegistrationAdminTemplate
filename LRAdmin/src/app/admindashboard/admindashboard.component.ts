@@ -3,15 +3,15 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  selector: 'app-admindashboard',
+  templateUrl: './admindashboard.component.html',
+  styleUrls: ['./admindashboard.component.css']
 })
-export class DashboardComponent {
+export class AdmindashboardComponent {
 
   constructor(private router:Router, public authservice:AuthService){}
 
-  logoutUser(){
+  logoutAdmin(){
     if(this.authservice.HaveAccess())
     {
     localStorage.removeItem('token');

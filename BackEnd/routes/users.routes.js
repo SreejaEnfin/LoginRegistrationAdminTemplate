@@ -111,7 +111,7 @@ urouter.post('/login', async(req, res)=>{
                     if(bcrypt.compareSync(userData.upassword, result.upassword)){
                         let payload = {
                             id:result.ObjectId,
-                            name:result.uname,
+                            name:result.ufname,
                             email:result.uemail,
                             role:result.urole
                         }
@@ -141,7 +141,7 @@ urouter.post('/login', async(req, res)=>{
 // get all users
 urouter.get('/', async(req, res)=>{
     try{
-    let result = await User.find();
+    let result = await User.find({}, {ufname:1, uemail:1, urole:1});
     res.status(200).json({
         "success":true,
         "data":result

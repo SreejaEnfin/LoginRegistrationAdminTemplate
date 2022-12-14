@@ -40,14 +40,18 @@ this.userservice.checkUser(this.LoginForm.value).subscribe((res:any)=>{
   if(parsedToken.email === 'admin@gmail.com'){
     localStorage.setItem('token', this.tokenData)
     localStorage.setItem('adminData', atobData);
+    alert("Login Successfull");
+    this.LoginForm.reset();
+    this.router.navigate(['/admin']);
   }
   else{
     localStorage.setItem('token',this.tokenData)
     localStorage.setItem('userData', atobData);
+    alert("Login Successfull");
+    this.LoginForm.reset();
+    this.router.navigate(['/dashboard']);
   }
- alert("Login Successfull");
-  this.LoginForm.reset();
-  this.router.navigate(['/dashboard']);
+ 
 },(err:any)=>{
 if(err.error.Error === "Password does not match")
   alert("Password does not match")

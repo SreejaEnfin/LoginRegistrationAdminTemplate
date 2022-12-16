@@ -60,49 +60,13 @@ urouter.post('/signup', async(req, res)=>{
     catch(err){
 res.status(400).json({
     "success":false,
-    error:Error
+    error:err.message
 });
     }
 });
 
-// login
-// urouter.post('/login', (req, res)=>{
-//     let userData = req.body;
-//     User.findOne({uemail:userData.uemail},(err, user)=>{
-//         if(err){
-//             res.json({
-//                 "success":false,
-//                 "data":err
-//             })
-//         }
-//         else{
-//             if(!user){
-//                 res.status(401).json({
-//                     "success":false,
-//                     "message":"Invalid Email",
-//                 })
-//             }else if(!bcrypt.compareSync(userData.upassword, user.upassword)){
-//                 res.status(401).json({
-//                     "success":false,
-//                     "message":"Invalid Password",
-//                 })
-//             }else{
-//                 let payload = {
-//                     id:user.ObjectId,
-//                     name:user.uname,
-//                     email:user.uemail
-//                 }
-//                 let token = jwt.sign(payload, "secretkey");
-//                 res.status(200).json({
-//                     "success":true,
-//                     "message":"Login Successfull",
-//                     "data":token
-//                 });
-//             }
-//         }
-//     });
-// });
 
+// login
 urouter.post('/login', async(req, res)=>{
     let userData = req.body;
     try{
@@ -115,7 +79,7 @@ urouter.post('/login', async(req, res)=>{
                             email:result.uemail,
                             role:result.urole
                         }
-                        let token = jwt.sign(payload, "secretkey");
+                        let token = jwt.sign(payload, process.env.SECRET_KEY);
                         res.status(200).json({
                             "success":true,
                             "message":"Login Successfull",
@@ -139,18 +103,32 @@ urouter.post('/login', async(req, res)=>{
 });
 
 // get all users
+
 urouter.get('/', async(req, res)=>{
-    try{
-    let result = await User.find({}, {ufname:1, uemail:1, urole:1});
+    const page = parseInt(req.query.page);
+    const limit = req.query.limit|4;
+    
+    const startIndex = (page-1)*limit;
+    
+    const results = {}
+    var pageDown = [];
+    try{  
+    results.finalData = await User.find({}, {ufname:1, uemail:1, urole:1}).limit(limit).skip(startIndex).exec();
+    results.count = await User.countDocuments();
+        results.pageCount = Math.ceil(results.count/limit);
+        for(i=1;i<=results.pageCount;i++){
+          pageDown.push(i);
+        }
+  
     res.status(200).json({
-        "success":true,
-        "data":result
+        success:true,
+        data:results
     });
 }catch(err)
 {
     res.status(400).json({
-        "success":false,
-        "data":err
+        success:false,
+        data:err.message
     })
 }
 })
@@ -160,7 +138,7 @@ urouter.delete('/:id', async(req, res)=>{
     try{
     if(objectId.isValid(req.params.id)){
         let result = await User.findByIdAndRemove(req.params.id);
-        res.send({
+        res.json({
             status:true,
             message:"Successfully deleted",
             data:result
@@ -170,7 +148,7 @@ urouter.delete('/:id', async(req, res)=>{
         throw new Error("Id not valid");
     }
 }catch(e){
-res.send({
+res.json({
     status:false,
     error:e.message
 })

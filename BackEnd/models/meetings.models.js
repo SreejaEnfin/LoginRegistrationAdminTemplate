@@ -1,26 +1,28 @@
 const mongoose = require('mongoose');
-const Meetings = mongoose.model("meeting",{
+const meetingSchema = new mongoose.Schema({
     mname:{
-        type:String,
+        type:String
     },
     mhost:[{
-        userId:{
-            type:String,
-        }
-    }],
-    mparticipants:[{
-        userId:{
-            type:String,
-        }
-    }],
-    mdate:{
-        type:String,
-    },
-    mstatus:
-    {
-        type:Boolean
-    },
-    
+        type:mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+}],
+mparticipants:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+}],
+mdate:{
+    type:Date,
+},
+mstatus:
+{
+    type:Boolean
+},
+mslug:{
+    type:String
+}
 });
+
+const Meetings = mongoose.model('meet', meetingSchema);
 
 module.exports = Meetings;

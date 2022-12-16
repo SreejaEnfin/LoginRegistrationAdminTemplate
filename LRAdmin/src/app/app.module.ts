@@ -8,7 +8,9 @@ import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { AdmindashboardComponent } from './admindashboard/admindashboard.component'
+import { AdmindashboardComponent } from './admindashboard/admindashboard.component';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { HeaderComponent } from './header/header.component'
 
 
 @NgModule({
@@ -17,7 +19,9 @@ import { AdmindashboardComponent } from './admindashboard/admindashboard.compone
     LoginComponent,
     SignupComponent,
     DashboardComponent,
-    AdmindashboardComponent
+    AdmindashboardComponent,
+    SidebarComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

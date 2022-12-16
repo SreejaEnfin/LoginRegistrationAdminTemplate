@@ -4,8 +4,19 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
+  userData:any;
+  adminData:any;
 
-  constructor() { }
+  constructor() {
+    const data = localStorage.getItem('userData');
+    if(data){
+      this.userData = JSON.parse(data);
+    }
+    const adata = localStorage.getItem('adminData');
+    if(adata){
+      this.adminData = JSON.parse(adata);
+    }
+   }
 
   HaveAccess()
   {

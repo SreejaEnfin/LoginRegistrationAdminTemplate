@@ -11,6 +11,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { AdmindashboardComponent } from './admindashboard/admindashboard.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { HeaderComponent } from './header/header.component'
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 
 @NgModule({
@@ -21,13 +23,16 @@ import { HeaderComponent } from './header/header.component'
     DashboardComponent,
     AdmindashboardComponent,
     SidebarComponent,
-    HeaderComponent
+    HeaderComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgMultiSelectDropDownModule.forRoot(),
+    Ng2SearchPipeModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]

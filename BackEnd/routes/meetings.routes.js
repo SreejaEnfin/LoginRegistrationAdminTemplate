@@ -27,7 +27,7 @@ mrouter.post('/', async(req, res)=>{
             mname:parsedData.mname,
             mhost:parsedData.mhost,
             mparticipants:parsedData.mparticipants,
-            mdate:new Date(),
+            mdate:new Date(parsedData.mdate),
             mstatus:parsedData.mstatus,
             mslug:uuidv4()
         });
@@ -50,11 +50,25 @@ mrouter.post('/', async(req, res)=>{
 // get
 mrouter.get('/', async(req, res)=>{
     try{
+        
+        const page = parseInt(req.query.page);
+        const limit = req.query.limit;
+        
+        const startIndex = (page-1)*limit;
+        
+        const results = {}
+        var pageDown = [];
         // let result = await Meetings.find().select("_id");
-        let result1 = await Meetings.find().populate(['mhost', 'mparticipants']);
+        results.finalData = await Meetings.find().populate([{path:'mhost', select:'ufname'}, {path:'mparticipants', select:'ufname'}]).limit(limit).skip(startIndex).exec();
+        results.count = await Meetings.countDocuments();
+        results.pageCount = Math.ceil(results.count/limit);
+        for(i=1;i<=results.pageCount;i++){
+          pageDown.push(i);
+        }
         res.status(200).json({
             message:"Successfull collected data",
-            data:result1
+            data:results,
+            pageDown:pageDown
         });
     }catch(e){
         res.status(400).json({

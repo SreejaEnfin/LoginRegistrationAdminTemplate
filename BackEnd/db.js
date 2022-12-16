@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-mongoose.connect("mongodb+srv://sreejamohan444:cluster0@cluster0.mwlsecd.mongodb.net/LoginSignupDB", (err)=>{
+mongoose.connect(process.env.DB_CONNECTION_STRING, (err)=>{
     if(err){
         console.log(err);
     }

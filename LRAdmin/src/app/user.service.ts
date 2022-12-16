@@ -2,14 +2,19 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Meetings } from './models/meetings.models';
 import { User } from './models/users.models';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
+  private subject = new Subject<any>();
+
   meetingsUrl = "http://localhost:3000/meetings"
   meetingsurlDelete = "http://localhost:3000/meetings/delete"
+  limit:number = 6;
+
   constructor(private http:HttpClient) { }
 // user
   adduser(user:User){
@@ -30,19 +35,28 @@ export class UserService {
 
   // meetings
   editMeetings(meetings:Meetings){
-    return this.http.put(this.meetingsUrl, meetings)
+    return this.http.put(`${this.meetingsUrl}/${meetings._id}`, meetings)
   }
 
   addMeetings(meetings:Meetings){
     return this.http.post(this.meetingsUrl, meetings);
   }
 
-  getMeetingsList(){
-    return this.http.get<Meetings[]>(this.meetingsUrl);
+  getMeetingsList(page:number) {
+    return this.http.get<Meetings[]>(this.meetingsUrl +'?page=' +page +'&limit=' +this.limit);
   }
 
+
   deleteMeetings(id:any){
-    return this.http.put(this.meetingsurlDelete, id);
+    return this.http.put(`${this.meetingsurlDelete}/${id}`, id);
   }
+
+  // sendClickEvent(){
+  //   this.subject.next();
+  // }
+
+  // getClickEvent():Observable<any>{
+  //   return this.subject.asObservable();
+  // }
 
 }

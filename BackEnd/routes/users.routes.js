@@ -104,7 +104,7 @@ urouter.post('/login', async(req, res)=>{
 
 // get all users
 
-urouter.get('/', async(req, res)=>{
+urouter.get('/withpagination', async(req, res)=>{
     const page = parseInt(req.query.page);
     const limit = req.query.limit|4;
     
@@ -131,6 +131,23 @@ urouter.get('/', async(req, res)=>{
         data:err.message
     })
 }
+})
+
+// only get
+
+urouter.get('/', async(req, res)=>{
+    try{
+        var result = await User.find();
+        res.status(200).json({
+            message:"Successully collected",
+            data:result
+        })
+    }catch(e){
+        res.status(400).json({
+            message:"Failed to collect",
+            error:e
+        })
+    }
 })
 
 // delete

@@ -6,13 +6,14 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AdmindashboardComponent } from './admindashboard/admindashboard.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { HeaderComponent } from './header/header.component'
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { AuthService } from './auth.service';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     ReactiveFormsModule,
     HttpClientModule,
     NgMultiSelectDropDownModule.forRoot(),
-    Ng2SearchPipeModule
+    Ng2SearchPipeModule,
+    FormsModule
 
   ],
   providers: [],

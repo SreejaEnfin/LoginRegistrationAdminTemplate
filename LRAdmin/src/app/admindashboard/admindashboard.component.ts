@@ -26,6 +26,7 @@ export class AdmindashboardComponent implements OnInit{
   clickEventSubscription!:Subscription;
   dropdownSettings:IDropdownSettings={};
   selectedItems=[];
+  searchText!:string;
 
   constructor(private userservice:UserService, private fb:FormBuilder){
     // this.clickEventSubscription = this.userservice.getClickEvent().subscribe(()=>{
@@ -132,8 +133,13 @@ this.getMeetings();
     }
     
     }
-
-    onsearch(){
-
-    }
+    
+    onSearch(event:string){
+      console.log("Search Text in dashboard ", event);
+      this.searchText=event;
+      console.log(this.searchText);
+      
+        }
+  
+    
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -9,18 +9,18 @@ import { UserService } from '../user.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent {
-  searchForm!:FormGroup
+export class HeaderComponent implements OnInit{
+  @Output() searchTextEvent = new EventEmitter<string>();
+  searchText!:string;
 
   
   constructor(private router:Router, public authservice:AuthService, private userservice:UserService, private fb:FormBuilder){}
 
   ngOnInit():void{
-    this.searchForm = this.fb.group({
-      searchText:['']
-    })
   }
   logoutAdmin(){
+
+   
     if(this.authservice.HaveAccess())
     {
     localStorage.removeItem('token');
@@ -34,12 +34,11 @@ export class HeaderComponent {
   }
   }
 
-  // search(){
-  //   this.userservice.searchUser(this.searchForm.value).subscribe((res)=>{
-  //     console.log(res);
-  //   },(err)=>{
-  //     console.log(err);
-  //   })
-  // }
+ 
+
+  onSearch(){
+    console.log("SearchText: ", this.searchText);
+    this.searchTextEvent.emit(this.searchText);
+  }
 
 }

@@ -37,7 +37,7 @@ urouter.post('/signup', async(req, res)=>{
             throw new Error("Confirm Password should be same as Password");
         }
         let useremail = req.body.uemail;
-        let resultforemail = await User.findOne({uemail: useremail});
+        let resultforemail = await User.findOne({uemail: useremail},{ufname:1, uemail:1});
         if(!resultforemail){
             let user = new User({
             ufname:req.body.ufname,
@@ -137,7 +137,7 @@ urouter.get('/withpagination', async(req, res)=>{
 
 urouter.get('/', async(req, res)=>{
     try{
-        var result = await User.find();
+        var result = await User.find({}, {ufname:1, uemail:1});
         res.status(200).json({
             message:"Successully collected",
             data:result

@@ -26,7 +26,7 @@
 <div class="content_body py-3">
     <div class="container">
         <div class="row">
-            <div class="col-md-4" *ngFor="let item of meetings | filter:searchText">
+            <div class="col-md-4" *ngFor="let item of meetings">
                 <div class="card mb-5">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -47,7 +47,9 @@
                     </div>
                   
                         <h6 class="card-subtitle mb-2 text-muted">Scheduled for {{ item.mdate }}</h6>
-                        <h6 class="card-subtitle mb-2 text-muted">Status {{ item.mstatus }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Status {{ item.mstatus ? "Active" : "Deleted"}}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Meeting ID {{ item.mslug }}</h6>
+
                         <hr>
                         <button type="button" class="btn btn-outline-primary mx-2" (click)="onEditMeeting(item)">Edit</button>
                         <button type="button" class="btn btn-outline-danger mx-2" (click)="onDeleteMeeting(item._id)">Delete</button>
@@ -58,19 +60,36 @@
     </div>
 </div>
 <!-- card for metings ends here -->
+
+
                 </div>
                 <!-- /.container-fluid -->
 
             </div>
             <!-- End of Main Content -->
 
-            <!-- pagination starts here -->
-            <div class="d-flex justify-content-center">
+            <!-- pagination starts herre -->
+
+         <nav aria-label="Page navigation example"> 
+                <ul class="pagination justify-content-center" *ngFor="let i of pages">
+                  <li class="page-item">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                  </li> 
+                  <li class="page-item d-flex "><a class="page-link d-flex listPage" (click)="pageChange(i)">{{i}}</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                  </li>
+                </ul>
+              </nav>
+
+
+            
+            <!-- pagination ends here -->
+            <!-- <div class="d-flex justify-content-center">
                 <ul *ngFor="let i of pages" class="listPage">
                   <li (click)="pageChange(i)">{{ i }}</li>
                 </ul>
-              </div>
-            <!-- pagination ends here -->
+              </div> -->
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
@@ -133,34 +152,42 @@
                             <input type="text" class="form-control" formControlName="mname">
                         </div>
 
-                        <div class="form-group">
-                            <!-- <label for="mhost">Host</label>
-                            <select class="form-select form-control" formControlName="mhost" >
-                                <option *ngFor="let item of users" value="{{item._id}}">{{ item.ufname }}
-                                </option>
-                            </select> -->
-
-                            <ng-select bindLabel="formControlName" 
+                    
+                            <div class="form-group">
+                                <label for="mhost">Hosts</label>
+                            <ng-select bindLabel="ufname" 
+                            [items]="users"
                         placeholder="Select"
-                        [(ngModel)]="selected"
-                        (add)="onAdd()"
-                        bindLabel="formControlName"
+                        [(ngModel)]="selectedDatah"
+                        (add)="onAddHost()"
                         [multiple]="true"
+                        name="mhost"
+                        formControlName="mhost"
                         >
-                        <ng-option [value]="item._id"  *ngFor="let item of users" formControlName="mhost" class="form-control">
+                        <ng-option [value]="item._id"  *ngFor="let item of users" class="form-control">
                             {{item.ufname }}
                         </ng-option>
                         </ng-select>
-                        </div>
+                    </div>
 
-                        <div class="form-group">
-                            <label for="mparticipants">Paricipants</label>
-                            <select class="form-select form-control" formControlName="mparticipants">
-                                <option *ngFor="let item of users" value="{{item._id}}">{{ item.ufname }}
-                                </option>
-                            </select>
-                        </div>
 
+                    <div class="form-group">
+                        <label for="mparticipants">Participants</label>
+                    <ng-select bindLabel="ufname" 
+                    [items]="users"
+                placeholder="Select"
+                [(ngModel)]="selectedDatam"
+                (add)="onAddParticipants()"
+                [multiple]="true"
+                name="mparticipants"
+                formControlName="mparticipants"
+                >
+                <ng-option [value]="item._id"  *ngFor="let item of users" class="form-control">
+                    {{item.ufname }}
+                </ng-option>
+                </ng-select>
+            </div>
+                       
                         <div class="form-group">
                             <label for="mdate">Date</label>
                             <input type="date" class="form-control" formControlName="mdate">

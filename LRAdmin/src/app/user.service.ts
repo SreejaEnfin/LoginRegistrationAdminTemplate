@@ -13,6 +13,7 @@ export class UserService {
 
   meetingsUrl = "http://localhost:3000/meetings"
   meetingsurlDelete = "http://localhost:3000/meetings/delete"
+  meetingsurlsearch = "http://localhost:3000/meetings/search"
   limit:number = 6;
 
   constructor(private http:HttpClient) { }
@@ -51,12 +52,8 @@ export class UserService {
     return this.http.put(`${this.meetingsurlDelete}/${id}`, id);
   }
 
-  // sendClickEvent(){
-  //   this.subject.next();
-  // }
-
-  // getClickEvent():Observable<any>{
-  //   return this.subject.asObservable();
-  // }
+  searchDetails(searchText:any, page:number){
+    return this.http.get(this.meetingsurlsearch+'?search=' +searchText +'&page=' +page +'&limit=' +this.limit);
+  }
 
 }

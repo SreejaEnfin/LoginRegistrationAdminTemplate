@@ -15,15 +15,9 @@
     list-style: none;
     display: inline-block;
   }
-  
+
   .listPage li{
-    margin: 20px 15px;
-    border: 1px solid black;
-    padding: 2px 5px;
     cursor: pointer;
   }
 
-  .listPage li:hover{
-    background-color: black;
-    color: white;
-  }
+ 

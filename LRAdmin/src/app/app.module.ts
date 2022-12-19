@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AdmindashboardComponent } from './admindashboard/admindashboard.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
@@ -36,7 +36,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     NgMultiSelectDropDownModule.forRoot(),
     Ng2SearchPipeModule,
     FormsModule,
-    NgSelectModule
+    NgSelectModule,
 
   ],
   providers: [],

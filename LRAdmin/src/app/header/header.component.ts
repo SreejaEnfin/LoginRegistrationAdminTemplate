@@ -41,4 +41,6 @@ export class HeaderComponent implements OnInit{
     this.searchTextEvent.emit(this.searchText);
   }
 
+  
+
 }

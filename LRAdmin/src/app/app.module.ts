@@ -14,6 +14,7 @@ import { HeaderComponent } from './header/header.component'
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { AuthService } from './auth.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import { AuthService } from './auth.service';
     AdmindashboardComponent,
     SidebarComponent,
     HeaderComponent,
+    
   ],
   imports: [
     BrowserModule,
@@ -33,7 +35,8 @@ import { AuthService } from './auth.service';
     HttpClientModule,
     NgMultiSelectDropDownModule.forRoot(),
     Ng2SearchPipeModule,
-    FormsModule
+    FormsModule,
+    NgSelectModule
 
   ],
   providers: [],

@@ -27,6 +27,8 @@ export class AdmindashboardComponent implements OnInit{
   dropdownSettings:IDropdownSettings={};
   selectedItems=[];
   searchText!:string;
+  events:Event[]=[];
+  selected=[];
 
   constructor(private userservice:UserService, private fb:FormBuilder){
     // this.clickEventSubscription = this.userservice.getClickEvent().subscribe(()=>{
@@ -141,5 +143,8 @@ this.getMeetings();
       
         }
   
+        onAdd() {
+console.log(this.selected);
+      }
     
 }

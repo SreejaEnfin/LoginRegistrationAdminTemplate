@@ -134,11 +134,23 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="mhost">Host</label>
+                            <!-- <label for="mhost">Host</label>
                             <select class="form-select form-control" formControlName="mhost" >
                                 <option *ngFor="let item of users" value="{{item._id}}">{{ item.ufname }}
                                 </option>
-                            </select>
+                            </select> -->
+
+                            <ng-select bindLabel="formControlName" 
+                        placeholder="Select"
+                        [(ngModel)]="selected"
+                        (add)="onAdd()"
+                        bindLabel="formControlName"
+                        [multiple]="true"
+                        >
+                        <ng-option [value]="item._id"  *ngFor="let item of users" formControlName="mhost" class="form-control">
+                            {{item.ufname }}
+                        </ng-option>
+                        </ng-select>
                         </div>
 
                         <div class="form-group">

@@ -8,7 +8,7 @@
             <!-- Main Content -->
             <div id="content">
 
-                <app-header (searchTextEvent)="onSearch($event)"></app-header>
+                <app-header (searchTextEvent)="getMeetings($event)"></app-header>
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
@@ -27,6 +27,48 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4" *ngFor="let item of meetings">
+                <div class="card mb-5" >
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ item.mname }}
+                        </h5>
+                        
+                        <h4>Hosted By: </h4>
+                        <div *ngFor="let i of item['mhost']">
+                        <h6 class="card-subtitle mb-2 text-muted" >
+                            {{ i['ufname']}}
+                        </h6>
+                    </div>
+                    <h4>Participants: </h4>
+                    <div *ngFor="let i of item['mparticipants']">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                         {{ i['ufname']}}
+                        </h6>
+                    </div>
+                  
+                        <h6 class="card-subtitle mb-2 text-muted">Scheduled for {{ item.mdate }}</h6>
+                        <h6 class="card-subtitle mb-2 text-light p-2" [ngStyle]="{'background-color': item.mstatus? 'green' : 'red'}">Status {{ item.mstatus ? "Active" : "Deleted"}}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Meeting ID {{ item.mslug }}</h6>
+
+                        <hr>
+                        <button type="button" class="btn btn-outline-primary mx-2" (click)="onEditMeeting(item)">Edit</button>
+                        <button type="button" class="btn btn-outline-danger mx-2" (click)="onDeleteMeeting(item._id)">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- card for metings ends here -->
+
+
+<!-- card for search card meetings starts here -->
+<h4>Search Results</h4>
+
+<!-- <div class="content_body py-3">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4" *ngFor="let item of meetingsNew">
                 <div class="card mb-5">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -58,10 +100,8 @@
             </div>
         </div>
     </div>
-</div>
-<!-- card for metings ends here -->
-
-
+</div> -->
+<!-- card for search results ends here -->
                 </div>
                 <!-- /.container-fluid -->
 
@@ -70,26 +110,14 @@
 
             <!-- pagination starts herre -->
 
-         <nav aria-label="Page navigation example"> 
-                <ul class="pagination justify-content-center" *ngFor="let i of pages">
-                  <li class="page-item">
-                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                  </li> 
-                  <li class="page-item d-flex "><a class="page-link d-flex listPage" (click)="pageChange(i)">{{i}}</a></li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                  </li>
-                </ul>
-              </nav>
+        <div class="d-flex justify-content-center">
+            <ul class="pagination pagination-lg" *ngFor="let i of pages">
+                <button class="page-item page-link" *ngIf="i===1" (click)="Previouspage()">Previous</button>
+                <li class="page-item"><a class="page-link" (click)="pageChange(i)">{{i}}</a></li>
+                <button class="page-item page-link"  *ngIf="i===pages.length" (click)="Nextpage()">Next</button>
+            </ul>
+        </div>
 
-
-            
-            <!-- pagination ends here -->
-            <!-- <div class="d-flex justify-content-center">
-                <ul *ngFor="let i of pages" class="listPage">
-                  <li (click)="pageChange(i)">{{ i }}</li>
-                </ul>
-              </div> -->
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
@@ -164,7 +192,7 @@
                         name="mhost"
                         formControlName="mhost"
                         >
-                        <ng-option [value]="item._id"  *ngFor="let item of users" class="form-control">
+                        <ng-option [value]="item._id"  *ngFor="let item of users" >
                             {{item.ufname }}
                         </ng-option>
                         </ng-select>
@@ -182,7 +210,7 @@
                 name="mparticipants"
                 formControlName="mparticipants"
                 >
-                <ng-option [value]="item._id"  *ngFor="let item of users" class="form-control">
+                <ng-option [value]="item._id"  *ngFor="let item of users" >
                     {{item.ufname }}
                 </ng-option>
                 </ng-select>

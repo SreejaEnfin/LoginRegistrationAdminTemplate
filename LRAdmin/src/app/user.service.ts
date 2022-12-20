@@ -13,7 +13,6 @@ export class UserService {
 
   meetingsUrl = "http://localhost:3000/meetings"
   meetingsurlDelete = "http://localhost:3000/meetings/delete"
-  meetingsurlsearch = "http://localhost:3000/meetings/search"
   limit:number = 6;
 
   constructor(private http:HttpClient) { }
@@ -43,9 +42,9 @@ export class UserService {
     return this.http.post(this.meetingsUrl, meetings);
   }
 
-  getMeetingsList(page:number) {
-    return this.http.get<Meetings[]>(this.meetingsUrl +'?page=' +page +'&limit=' +this.limit);
-  }
+  // getMeetingsList(page:number) {
+  //   return this.http.get<Meetings[]>(this.meetingsUrl +'?page=' +page +'&limit=' +this.limit);
+  // }
 
 
   deleteMeetings(id:any){
@@ -53,7 +52,7 @@ export class UserService {
   }
 
   searchDetails(searchText:any, page:number){
-    return this.http.get(this.meetingsurlsearch+'?search=' +searchText +'&page=' +page +'&limit=' +this.limit);
+    return this.http.get(this.meetingsUrl+'?search=' +searchText +'&page=' +page +'&limit=' +this.limit);
   }
 
 }

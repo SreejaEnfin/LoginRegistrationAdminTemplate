@@ -52,54 +52,68 @@ mrouter.post('/', async(req, res)=>{
 
 
 // get
-mrouter.get('/', async(req, res)=>{
-    try{
+// mrouter.get('/', async(req, res)=>{
+//     try{
         
-        const page = parseInt(req.query.page);
-        const limit = req.query.limit;
+//         const page = parseInt(req.query.page);
+//         const limit = req.query.limit;
         
-        const startIndex = (page-1)*limit;
+
+//         const searchText = req.query.search;
+//         console.log(this.searchText);
+
+//         if(searchText){
+//             console.log("In search area");
+//         }
         
-        const results = {}
-        var pageDown = [];
-        // let result = await Meetings.find().select("_id");
-        results.finalData = await Meetings.find().populate([{path:'mhost', select:'ufname'}, {path:'mparticipants', select:'ufname'}]).limit(limit).skip(startIndex).exec();
-        results.count = await Meetings.countDocuments();
-        results.pageCount = Math.ceil(results.count/limit);
-        for(i=1;i<=results.pageCount;i++){
-          pageDown.push(i);
-        }
-        res.status(200).json({
-            message:"Successfull collected data",
-            data:results,
-            pageDown:pageDown
-        });
-    }catch(e){
-        res.status(400).json({
-            message:"Failed to collect data",
-            error:e.message
-        })
-    }
-})
+//         const startIndex = (page-1)*limit;
+        
+//         const results = {}
+//         var pageDown = [];
+//         // let result = await Meetings.find().select("_id");
+//         results.finalData = await Meetings.find().sort({_id:-1}).populate([{path:'mhost', select:'ufname'}, {path:'mparticipants', select:'ufname'}]).limit(limit).skip(startIndex).exec();
+//         results.count = await Meetings.countDocuments();
+//         results.pageCount = Math.ceil(results.count/limit);
+//         for(i=1;i<=results.pageCount;i++){
+//           pageDown.push(i);
+//         }
+//         res.status(200).json({
+//             message:"Successfull collected data",
+//             data:results,
+//             pageDown:pageDown
+//         });
+//     }catch(e){
+//         res.status(400).json({
+//             message:"Failed to collect data",
+//             error:e.message
+//         })
+//     }
+// })
 // add pagination
 
 //  search by meeting name / slug with pagination
-mrouter.get('/search', async(req, res)=>{
+mrouter.get('/', async(req, res)=>{
     try{
-        
         const page = parseInt(req.query.page);
         const limit = req.query.limit;
         const searchText = req.query.search;
+        var query={};
+        
+        if(searchText){
+            query = {$or: [ {mname:{$regex:searchText, $options: 'i'}}, { mslug:{$regex:searchText, $options:'i'} } ] }
+        }
         
         const startIndex = (page-1)*limit;
         
         const results = {}
         var pageDown = [];
-        // let result = await Meetings.find().select("_id");
-        results.finalData = await Meetings.find({$or: [ {mname:{$regex:searchText, $options: 'i'}}, { mslug:{$regex:searchText, $options:'i'} } ] }).populate([{path:'mhost', select:'ufname'}, {path:'mparticipants', select:'ufname'}]).limit(limit).skip(startIndex).sort({mdate:1}).exec();
 
-        results.count = await Meetings.countDocuments({$or: [ {mname:{$regex:searchText, $options: 'i'}}, { mslug:{$regex:searchText, $options:'i'} } ] });
+        results.finalData = await Meetings.find(query).sort({_id:-1}).populate([{path:'mhost', select:'ufname'}, {path:'mparticipants', select:'ufname'}]).limit(limit).skip(startIndex).exec();
+
+        results.count = await Meetings.countDocuments(query);
+        
         results.pageCount = Math.ceil(results.count/limit);
+        
         for(i=1;i<=results.pageCount;i++){
           pageDown.push(i);
         }

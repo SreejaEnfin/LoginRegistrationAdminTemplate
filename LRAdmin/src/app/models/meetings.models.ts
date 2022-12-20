@@ -3,7 +3,7 @@ export interface Meetings{
     mname:string;
     mhost:[];
     mparticipants:[];
-    mdate:Date;
+    mdate:string;
     mstatus:boolean;
     mslug:string
 }

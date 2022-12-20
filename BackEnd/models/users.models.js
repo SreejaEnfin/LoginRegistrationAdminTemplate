@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
         type:String
     },
     urole:{
-        type:String
+        type:Number
     }
 })
 

@@ -137,7 +137,7 @@ urouter.get('/withpagination', async(req, res)=>{
 
 urouter.get('/', async(req, res)=>{
     try{
-        var result = await User.find({}, {ufname:1, uemail:1});
+        var result = await User.find({urole: 2},{ufname:1, uemail:1, urole:1});
         res.status(200).json({
             message:"Successully collected",
             data:result

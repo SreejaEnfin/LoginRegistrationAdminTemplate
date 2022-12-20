@@ -24,11 +24,12 @@ export class AdmindashboardComponent implements OnInit{
   pagecount:any;
   pages:any[]=[];
   page:number=1;
-  searchText!:string;
+  searchText:string='';
   events:Event[]=[];
   selectedDatah:any[]=[];
   selectedDatam:any[]=[];
-  meetingsNew:any=[];
+  // meetingsNew!:Meetings[];
+  current:number=1;
 
   constructor(private userservice:UserService, private fb:FormBuilder){
     // this.clickEventSubscription = this.userservice.getClickEvent().subscribe(()=>{
@@ -38,7 +39,7 @@ export class AdmindashboardComponent implements OnInit{
 
   ngOnInit(){
     this.getUsers();
-    this.getMeetings();
+    this.getMeetings(this.searchText);
     this.MeetingForm = this.fb.group({
       _id:'',
       mname:['', [Validators.required]],
@@ -64,7 +65,7 @@ export class AdmindashboardComponent implements OnInit{
     if(this.MeetingForm.valid){
       if(this.editMeetingMode){
         this.userservice.editMeetings(this.MeetingForm.value).subscribe((res)=>{
-          this.getMeetings();
+          this.getMeetings(this.searchText);
           this.showMeetingModal=false;
           this.MeetingForm.reset();
           this.editMeetingMode = false;
@@ -77,7 +78,7 @@ export class AdmindashboardComponent implements OnInit{
         console.log(this.MeetingForm.value)
         this.userservice.addMeetings(this.MeetingForm.value).subscribe((res)=>{
           console.log(res);
-          this.getMeetings();
+          this.getMeetings(this.searchText);
           this.showMeetingModal=false;
           this.MeetingForm.reset();
           this.editMeetingMode = false;
@@ -98,14 +99,12 @@ export class AdmindashboardComponent implements OnInit{
   }
 
 
-  getMeetings() {
-    this.userservice.getMeetingsList(this.page).subscribe((res:any) => {
+  getMeetings(searchText:any) {
+    this.userservice.searchDetails(searchText, this.page).subscribe((res:any) => {
       this.meetings = res.data.finalData;
-      
       console.log(this.meetings);
       this.pagecount = res.data.pageCount;
       this.pages = res.pageDown;
-     
     },(err)=>{
       console.log(err);
     });
@@ -114,7 +113,8 @@ export class AdmindashboardComponent implements OnInit{
 
   pageChange(i:any){
     console.log(i);
-    this.userservice.getMeetingsList(i).subscribe((res: any) => {
+    this.current = i;
+    this.userservice.searchDetails(this.searchText, i).subscribe((res: any) => {
       console.log(res.data.finalData);
       this.meetings = res.data.finalData;
     });
@@ -130,7 +130,7 @@ export class AdmindashboardComponent implements OnInit{
     if(confirm("Are you sure you want to delete this meeting?")){
       this.userservice.deleteMeetings(id).subscribe((res)=>{
 console.log(res);
-this.getMeetings();
+this.getMeetings(this.searchText);
       }, (err)=>{
         console.log(err);
       })
@@ -141,15 +141,17 @@ this.getMeetings();
     onSearch(event:string){
       console.log("Search Text in dashboard ", event);
       this.searchText=event;
-      console.log(this.searchText);
-      this.userservice.searchDetails(this.searchText, this.page).subscribe((res)=>{
-        this.meetingsNew = res;
-        console.log(res);
-      },(err)=>{
-        if(err.error.error === "Member not found"){
-          console.log("Member not Found");
-        }
-      })
+      this.getMeetings(this.searchText);
+      // console.log(this.searchText);
+      // this.userservice.searchDetails(this.searchText, this.page).subscribe((res:any)=>{
+      //   this.meetings = res.data.finalData;
+      //   // this.meetingsNew = res;
+      //   console.log(res);
+      // },(err)=>{
+      //   if(err.error.error === "Member not found"){
+      //     console.log("Member not Found");
+      //   }
+      // })
       
         }
   
@@ -159,6 +161,29 @@ this.getMeetings();
 
       onAddParticipants() {
         console.log(this.selectedDatam)
+    }
+
+    Nextpage(){
+      
+      if(this.current < this.pages.length)
+      {
+        this.current++;
+        this.pageChange(this.current);
+      }else{
+        console.log("No pages");
+      }
+      
+    }
+
+    Previouspage(){
+      if(this.current > 1){
+        this.current--;
+        this.pageChange(this.current);
+      }
+      else{
+        console.log("No pages");
+      }
+     
     }
     
 }

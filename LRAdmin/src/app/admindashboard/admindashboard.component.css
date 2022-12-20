@@ -13,7 +13,8 @@
 
 .listPage{
     list-style: none;
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
   }
 
   .listPage li{

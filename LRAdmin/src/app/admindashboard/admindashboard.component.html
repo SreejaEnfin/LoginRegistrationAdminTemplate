@@ -1,5 +1,7 @@
     <!-- Page Wrapper -->
     <div id="wrapper">
+
+        
         <app-sidebar></app-sidebar>
 
         <!-- Content Wrapper -->
@@ -8,7 +10,9 @@
             <!-- Main Content -->
             <div id="content">
 
-                <app-header (searchTextEvent)="getMeetings($event)"></app-header>
+                <app-header></app-header>
+
+                <!-- (searchTextEvent)="getMeetings($event)" -->
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
@@ -21,6 +25,25 @@
         <button class="btn btn-light" (click)="onAddMeeting()">Add Meeting</button>
     </div>
 </div>
+<hr>
+
+ <!-- search and filter starts here -->
+ <div class="input-group">
+    <!-- (input)="onSearch()" [(ngModel)]="searchText" (click)="onSearch()"-->
+    <input type="text" #search (input)="onSearch(search.value)"  class="form-control bg-light border-0 small" placeholder="Search for..."
+        aria-label="Search" aria-describedby="basic-addon2">
+    <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">
+            <!-- <i class="fas fa-search fa-sm"></i> -->Filter
+        </button>
+        <select #filter class="select" (change)="onFilter(filter.value)">
+            <option default>Select</option>
+            <option>Active</option>
+            <option>Deleted</option>
+        </select>
+    </div>
+</div>
+<!-- search and filter ends here -->
 <hr>
 <!-- card for meetings starts here -->
 <div class="content_body py-3">
@@ -61,47 +84,10 @@
 </div>
 <!-- card for metings ends here -->
 
+<div *ngIf="this.searchFail" class="d-flex justify-content-center align-items-center">
+<p class="h3">Ooops!!! No such result</p>
+</div>
 
-<!-- card for search card meetings starts here -->
-<h4>Search Results</h4>
-
-<!-- <div class="content_body py-3">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4" *ngFor="let item of meetingsNew">
-                <div class="card mb-5">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            {{ item.mname }}
-                        </h5>
-                        
-                        <h4>Hosted By: </h4>
-                        <div *ngFor="let i of item['mhost']">
-                        <h6 class="card-subtitle mb-2 text-muted" >
-                            {{ i['ufname']}}
-                        </h6>
-                    </div>
-                    <h4>Participants: </h4>
-                    <div *ngFor="let i of item['mparticipants']">
-                        <h6 class="card-subtitle mb-2 text-muted">
-                         {{ i['ufname']}}
-                        </h6>
-                    </div>
-                  
-                        <h6 class="card-subtitle mb-2 text-muted">Scheduled for {{ item.mdate }}</h6>
-                        <h6 class="card-subtitle mb-2 text-muted">Status {{ item.mstatus ? "Active" : "Deleted"}}</h6>
-                        <h6 class="card-subtitle mb-2 text-muted">Meeting ID {{ item.mslug }}</h6>
-
-                        <hr>
-                        <button type="button" class="btn btn-outline-primary mx-2" (click)="onEditMeeting(item)">Edit</button>
-                        <button type="button" class="btn btn-outline-danger mx-2" (click)="onDeleteMeeting(item._id)">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
-<!-- card for search results ends here -->
                 </div>
                 <!-- /.container-fluid -->
 
@@ -113,7 +99,7 @@
         <div class="d-flex justify-content-center">
             <ul class="pagination pagination-lg" *ngFor="let i of pages">
                 <button class="page-item page-link" *ngIf="i===1" (click)="Previouspage()">Previous</button>
-                <li class="page-item"><a class="page-link" (click)="pageChange(i)">{{i}}</a></li>
+                <li class="page-item"><a class="page-link" [ngStyle]="{'background-color': changeColor===i? 'blue' : 'white'}" (click)="pageChange(i)">{{i}}</a></li>
                 <button class="page-item page-link"  *ngIf="i===pages.length" (click)="Nextpage()">Next</button>
             </ul>
         </div>

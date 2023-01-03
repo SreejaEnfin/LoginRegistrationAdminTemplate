@@ -7,7 +7,7 @@ import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AdmindashboardComponent } from './admindashboard/admindashboard.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { HeaderComponent } from './header/header.component'
@@ -15,6 +15,10 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { AuthService } from './auth.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { TokenInterceptorService } from './token-interceptor.service';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { JoinMeetingComponent } from './join-meeting/join-meeting.component';
 
 
 @NgModule({
@@ -26,6 +30,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
     AdmindashboardComponent,
     SidebarComponent,
     HeaderComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    JoinMeetingComponent,
     
   ],
   imports: [
@@ -39,7 +46,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     NgSelectModule,
 
   ],
-  providers: [],
+  providers: [{provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorService, multi:true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

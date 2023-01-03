@@ -1,12 +1,9 @@
-import { Component, forwardRef, OnInit} from '@angular/core';
-import { FormBuilder, FormGroup, NgModel, NG_VALUE_ACCESSOR, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { Component, OnInit} from '@angular/core';
+import { FormBuilder, FormGroup,  Validators } from '@angular/forms';
+import { Route, Router } from '@angular/router';
 import { Meetings } from '../models/meetings.models';
 import { User } from '../models/users.models';
 import { UserService } from '../user.service';
-import { Subscription } from 'rxjs';
-import { IDropdownSettings } from 'ng-multiselect-dropdown';
 
 @Component({
   selector: 'app-admindashboard',
@@ -25,13 +22,16 @@ export class AdmindashboardComponent implements OnInit{
   pages:any[]=[];
   page:number=1;
   searchText:string='';
-  events:Event[]=[];
   selectedDatah:any[]=[];
   selectedDatam:any[]=[];
-  // meetingsNew!:Meetings[];
+  searchFail:boolean=false;
+  changeColor:number = 1;
+  filterText:string='';
   current:number=1;
+  searchGap:any;
+  
 
-  constructor(private userservice:UserService, private fb:FormBuilder){
+  constructor(private userservice:UserService, private fb:FormBuilder, private router:Router){
     // this.clickEventSubscription = this.userservice.getClickEvent().subscribe(()=>{
     //   this.onsearch();
     // })
@@ -39,7 +39,7 @@ export class AdmindashboardComponent implements OnInit{
 
   ngOnInit(){
     this.getUsers();
-    this.getMeetings(this.searchText);
+    this.getMeetings(this.searchText, this.filterText)
     this.MeetingForm = this.fb.group({
       _id:'',
       mname:['', [Validators.required]],
@@ -65,7 +65,7 @@ export class AdmindashboardComponent implements OnInit{
     if(this.MeetingForm.valid){
       if(this.editMeetingMode){
         this.userservice.editMeetings(this.MeetingForm.value).subscribe((res)=>{
-          this.getMeetings(this.searchText);
+          this.getMeetings(this.searchText, this.filterText)
           this.showMeetingModal=false;
           this.MeetingForm.reset();
           this.editMeetingMode = false;
@@ -78,7 +78,7 @@ export class AdmindashboardComponent implements OnInit{
         console.log(this.MeetingForm.value)
         this.userservice.addMeetings(this.MeetingForm.value).subscribe((res)=>{
           console.log(res);
-          this.getMeetings(this.searchText);
+          this.getMeetings(this.searchText, this.filterText)
           this.showMeetingModal=false;
           this.MeetingForm.reset();
           this.editMeetingMode = false;
@@ -99,14 +99,22 @@ export class AdmindashboardComponent implements OnInit{
   }
 
 
-  getMeetings(searchText:any) {
-    this.userservice.searchDetails(searchText, this.page).subscribe((res:any) => {
+  getMeetings(searchText:string, filterText:string) {
+    this.userservice.searchDetails(searchText, this.page, filterText).subscribe((res:any) => {
+      this.searchFail = false;
       this.meetings = res.data.finalData;
       console.log(this.meetings);
       this.pagecount = res.data.pageCount;
       this.pages = res.pageDown;
+      if(res.data.finalData.length === 0){
+        this.searchFail = true
+      }
+  
     },(err)=>{
       console.log(err);
+      if(err.status===401){
+        this.router.navigate(['/login']);
+      }
     });
   }
 
@@ -114,7 +122,8 @@ export class AdmindashboardComponent implements OnInit{
   pageChange(i:any){
     console.log(i);
     this.current = i;
-    this.userservice.searchDetails(this.searchText, i).subscribe((res: any) => {
+    this.changeColor=i;
+    this.userservice.searchDetails(this.searchText, i, this.filterText).subscribe((res: any) => {
       console.log(res.data.finalData);
       this.meetings = res.data.finalData;
     });
@@ -130,7 +139,7 @@ export class AdmindashboardComponent implements OnInit{
     if(confirm("Are you sure you want to delete this meeting?")){
       this.userservice.deleteMeetings(id).subscribe((res)=>{
 console.log(res);
-this.getMeetings(this.searchText);
+this.getMeetings(this.searchText, this.filterText)
       }, (err)=>{
         console.log(err);
       })
@@ -138,24 +147,20 @@ this.getMeetings(this.searchText);
     
     }
     
-    onSearch(event:string){
-      console.log("Search Text in dashboard ", event);
-      this.searchText=event;
-      this.getMeetings(this.searchText);
-      // console.log(this.searchText);
-      // this.userservice.searchDetails(this.searchText, this.page).subscribe((res:any)=>{
-      //   this.meetings = res.data.finalData;
-      //   // this.meetingsNew = res;
-      //   console.log(res);
-      // },(err)=>{
-      //   if(err.error.error === "Member not found"){
-      //     console.log("Member not Found");
-      //   }
-      // })
-      
-        }
+    onSearch(event:any){
+      if(this.searchGap){
+        clearTimeout(this.searchGap);
+      }
+      this.searchGap= setTimeout(()=>{
+        console.log("Search Text in dashboard ", event);
+        this.searchText=event;
+        this.getMeetings(this.searchText, this.filterText)
+        console.log(this.searchText);
   
-        onAddHost() {
+      }, 1000);
+    }
+  
+    onAddHost() {
           console.log(this.selectedDatah)
       }
 
@@ -184,6 +189,18 @@ this.getMeetings(this.searchText);
         console.log("No pages");
       }
      
+    }
+
+    onFilter(event:any){
+console.log(event);
+if(event==='Active'){
+  this.filterText='1';
+  console.log(this.filterText);
+}
+else
+this.filterText = '0';
+console.log(this.filterText);
+this.getMeetings(this.searchText, this.filterText)
     }
     
 }

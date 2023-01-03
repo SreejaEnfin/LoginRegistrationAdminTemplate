@@ -10,8 +10,8 @@ import { UserService } from '../user.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit{
-  @Output() searchTextEvent = new EventEmitter<string>();
-  searchText!:string;
+  // @Output() searchTextEvent = new EventEmitter<string>();
+  // searchText!:string;
 
   
   constructor(private router:Router, public authservice:AuthService, private userservice:UserService, private fb:FormBuilder){}
@@ -36,10 +36,10 @@ export class HeaderComponent implements OnInit{
 
  
 
-  onSearch(){
-    console.log("SearchText: ", this.searchText);
-    this.searchTextEvent.emit(this.searchText);
-  }
+  // onSearch(){
+  //   console.log("SearchText: ", this.searchText);
+  //   this.searchTextEvent.emit(this.searchText);
+  // }
 
   
 

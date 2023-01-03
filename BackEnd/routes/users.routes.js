@@ -5,12 +5,11 @@ const urouter = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const yup = require('yup');
+const path= require('path');
+const ejs = require('ejs');
 const objectId = require('mongoose').Types.ObjectId;
+const emailService = require("../utils/sendEmail");
 
-const app = express();
-
-app.use(express.json());
-app.use(cors());
 
 // yup validation
 
@@ -26,6 +25,7 @@ const createUserSchema = yup.object().shape({
 
 // signup
 urouter.post('/signup', async(req, res)=>{
+    console.log("In Signup")
     try{
         const parsedData = await createUserSchema.validate(req.body);
         let pass = parsedData.upassword;
@@ -66,17 +66,19 @@ res.status(400).json({
 });
 
 
+
+
 // login
-urouter.post('/login', async(req, res)=>{
-    let userData = req.body;
+urouter.get('/login', async(req, res)=>{
+    let userData = req.query;
     try{
-        let result = await User.findOne({uemail: userData.uemail});
+        let result = await User.findOne({uemail: userData.email});
             if(result){
-                    if(bcrypt.compareSync(userData.upassword, result.upassword)){
+                    if(bcrypt.compareSync(userData.password, result.upassword)){
                         let payload = {
-                            id:result.ObjectId,
-                            name:result.ufname,
+                            _id:result._id,
                             email:result.uemail,
+                            name:result.ufname,
                             role:result.urole
                         }
                         let token = jwt.sign(payload, process.env.SECRET_KEY);
@@ -102,41 +104,12 @@ urouter.post('/login', async(req, res)=>{
     }
 });
 
-// get all users
 
-urouter.get('/withpagination', async(req, res)=>{
-    const page = parseInt(req.query.page);
-    const limit = req.query.limit|4;
-    
-    const startIndex = (page-1)*limit;
-    
-    const results = {}
-    var pageDown = [];
-    try{  
-    results.finalData = await User.find({}, {ufname:1, uemail:1, urole:1}).limit(limit).skip(startIndex).exec();
-    results.count = await User.countDocuments();
-        results.pageCount = Math.ceil(results.count/limit);
-        for(i=1;i<=results.pageCount;i++){
-          pageDown.push(i);
-        }
-  
-    res.status(200).json({
-        success:true,
-        data:results
-    });
-}catch(err)
-{
-    res.status(400).json({
-        success:false,
-        data:err.message
-    })
-}
-})
 
 // only get
 
 urouter.get('/', async(req, res)=>{
-    try{
+            try{
         var result = await User.find({urole: 2},{ufname:1, uemail:1, urole:1});
         res.status(200).json({
             message:"Successully collected",
@@ -147,6 +120,82 @@ urouter.get('/', async(req, res)=>{
             message:"Failed to collect",
             error:e
         })
+    }
+})
+
+
+// forgot-password
+urouter.post('/forgot-password', async(req, res)=>{
+    try{
+        const email = req.query.email
+        console.log(email);
+        var result = await User.findOne({uemail:email});
+        if(!result){
+                throw new Error("Invalid Email");
+            }else{
+                console.log(result);
+                let payload = {
+                    _id:result._id,
+                    email:result.uemail
+                }
+                let forgotToken = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn:'15m'});
+                let newData = {
+                    forgotToken:forgotToken
+                }
+                // connecting ejs file
+                const emailBodyPath = path.join(__dirname, '../views/resetPassword.ejs');
+                console.log(emailBodyPath);
+                const name = result.ufname;
+                const urlPath = process.env.LOCAL_HOST_URL
+                const emailBody = await ejs.renderFile(emailBodyPath, {name,forgotToken, urlPath});
+                console.log(emailBody);
+                // sending email
+                await emailService.sendEmail(result.uemail, emailBody, "Reset Password")
+
+                let resultData = await User.findByIdAndUpdate(result._id, {$set:newData}, {new:true});
+                res.status(200).json({
+                    message:"User found",
+                    data:forgotToken,
+                    updated:resultData
+                })
+            }
+        }
+    catch(e){
+        res.json({
+            err: e.message
+        })    }
+})
+
+// reset-password 
+urouter.post('/reset-password', async (req, res)=>{
+try{
+    var pass = req.body.upassword;
+    var hash = bcrypt.hashSync(pass,10);
+    const token=req.query.forgotToken;
+    
+    const resetVerify = jwt.verify(token, process.env.SECRET_KEY);
+    console.log(resetVerify);
+    if(resetVerify){
+        var resetUser = await User.findOne({forgotToken:token})
+        if(!resetUser){
+            throw new Error("No such user Exists");
+        }
+        console.log(resetUser);
+        let afterReset = await User.updateOne({_id:resetVerify._id}, {$set:{forgotToken:'',
+        upassword:hash}});
+        res.status(200).json({
+            message:"Verified and updated successfully",
+        })
+        
+    }
+    else{
+        throw new Error("User is not verified");
+    }
+}
+    catch(e){
+res.json({
+    e:Error.message
+})
     }
 })
 
@@ -171,5 +220,36 @@ res.json({
 })
 }
 })
+
+
+// update
+urouter.put('/:id', async(req, res)=>{
+    try{
+        if(objectId.isValid(req.params.id)){
+            let user = {
+                ufname:req.body.ufname,
+                uemail:req.body.uemail,
+                urole:req.body.urole,
+            }
+            const result = await User.findByIdAndUpdate(
+                req.params.id,
+                { $set: user },
+                { new: true });
+                res.status(200).json({
+                    message:'Data updated',
+                    data:result
+                  });
+        }
+        else{
+            throw new Error("Id not valid");
+        }
+    }catch(e){
+    res.json({
+        status:false,
+        error:e.message
+    })
+    }
+    
+} )
 
 module.exports = urouter;

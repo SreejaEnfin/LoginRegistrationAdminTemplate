@@ -11,19 +11,57 @@
 
                 <!-- Begin Page Content -->
                 <div class=" d-flex justify-content-between bg-primary p-3">
-
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-4 mt-3 text-light">Hi {{this.authservice.userData.name}} !!!</h1>
+                    <h1 class="h3 mb-4 mt-3 text-light">Hi {{this.authservice.userData.name}}</h1>
                     <button href="#" class="btn btn-light" (click)="logoutUser()" data-toggle="modal" data-target="#logoutModal">
                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                         Logout
                     </button>
-
                 </div>
                 <!-- /.container-fluid -->
 
+                <div class="mx-5" *ngIf="!this.noMeetings"> 
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Meeting Name
+                                </th>
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let i of details" >
+                                <!--  -->
+                                <td>{{i.mname}}</td>
+                                <td>{{i.mdate | date: 'dd/MM/yyyy'}}</td>
+                                <td><button class="btn btn-primary text-light p-2" (click)="joinBtn(i.mslug)">JOIN</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-center mt-5">
+                    <p class="h2 text-muted" *ngIf="this.noMeetings">No Meetings!!!</p>
+                </div>
+
             </div>
             <!-- End of Main Content -->
+
+             <!-- pagination starts herre -->
+
+        <div class="d-flex justify-content-center">
+            <ul class="pagination pagination-lg" *ngFor="let i of pages">
+                <button class="page-item page-link" *ngIf="i===1" (click)="Previouspage()">Previous</button>
+                <li class="page-item"><a class="page-link" [ngStyle]="{'background-color': changeColor===i? 'blue' : 'white'}" (click)="pageChange(i)">{{i}}</a></li>
+                <button class="page-item page-link"  *ngIf="i===pages.length" (click)="Nextpage()">Next</button>
+            </ul>
+        </div>
 
             <!-- Footer -->
             <footer class="sticky-footer bg-white">
@@ -65,4 +103,3 @@
             </div>
         </div>
     </div>
-    

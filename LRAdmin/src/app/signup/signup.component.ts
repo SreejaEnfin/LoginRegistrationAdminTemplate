@@ -33,10 +33,10 @@ export class SignupComponent {
       this.signupForm.reset();
       this.router.navigate(['/login']);
     },(err)=>{
-      if(err.error.message == "Email already exits"){
+      if(err.error.error == "Email already exits"){
         alert("Email already exists. Please Try another Email");
       }
-      else if(err.error.message == "Confirm Password should be same as Password"){
+      else if(err.error.error == "Confirm Password should be same as Password"){
         alert("Confirm Password should be same as Password");
       }
       else{

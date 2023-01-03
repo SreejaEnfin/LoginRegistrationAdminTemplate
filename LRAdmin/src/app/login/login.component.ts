@@ -17,14 +17,15 @@ constructor(private router:Router, private fb:FormBuilder, private userservice:U
 
 ngOnInit():void{
   this.LoginForm = this.fb.group({
-    uemail:['', [Validators.required, Validators.email]],
+    uemail:['', [Validators.required]],
     upassword:['', [Validators.required, Validators.minLength(4)]]
   })
 }
 
   onLogin(){
     if(this.LoginForm.valid){
-this.userservice.checkUser(this.LoginForm.value).subscribe((res:any)=>{
+      console.log(this.LoginForm.value);
+this.userservice.checkUser(this.LoginForm.value.uemail, this.LoginForm.value.upassword).subscribe((res:any)=>{
   console.log(res);
   // token from backend to a variable
   this.tokenData = res.data;

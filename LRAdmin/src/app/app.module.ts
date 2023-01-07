@@ -19,6 +19,10 @@ import { TokenInterceptorService } from './token-interceptor.service';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { JoinMeetingComponent } from './join-meeting/join-meeting.component';
+import { SocketioService } from './socketio.service';
+import { SocketIoModule, SocketIoConfig} from 'ngx-socket-io';
+import { CommonModule } from '@angular/common';
+const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 
 @NgModule({
@@ -44,9 +48,11 @@ import { JoinMeetingComponent } from './join-meeting/join-meeting.component';
     Ng2SearchPipeModule,
     FormsModule,
     NgSelectModule,
+    SocketIoModule.forRoot(config),
+    CommonModule
 
   ],
-  providers: [{provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorService, multi:true}],
+  providers: [{provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorService, multi:true}, SocketioService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,1 +1,57 @@
-<p>join-meeting works!</p>
+<section class="mainSection col-12">
+  <div class="container-fluid totalArea col-12">
+     
+    <div class="screen bg-dark"  [class.col-9]="onClickChat">
+      <div>
+      <button  (click)="chat()" type="submit">Chat</button>
+      <button  (click)="logoutUser()" type="submit">Logout</button>
+    </div>
+    </div>
+   
+
+<div  class="chat bg-success" [class.d-none]="!onClickChat" [class.col-3.d-block]="onClickChat">
+  <section style="background-color: #eee; height: 100vh; width: 100%;">
+    <div class="container">
+  
+      <div class="row d-flex justify-content-center">
+  
+          <div class="card" style="height: 100vh; width: 100%;">
+            <div class="card-header d-flex justify-content-between align-items-center p-3"
+              style="border-top: 4px solid #ffa900;">
+              <h5 class="mb-0">Chat messages</h5>
+              <div class="d-flex flex-row align-items-center">
+                <i class="fas fa-times text-muted fa-xs" (click)="closeChat()"></i>
+              </div>
+            </div>
+            <!-- card header ends -->
+            <div class="card-body chatBody" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
+              <div class="form-group container">
+                <ul id="listOfMessages">
+                    <li class="singleMessage" *ngFor="let message of messageList">
+                        {{message}}
+                    </li>
+                </ul>
+            
+               
+            </div>
+            <div class="messages"></div>
+            <div class="card-footer text-muted  p-3">
+              
+                <form class="p-2" [formGroup]="chatForm" (ngSubmit)="sendmsgs()">
+                  <div class="form-group d-flex justify-content-between" style="position: fixed; bottom: 10px;">
+                    <input type="text" formControlName="message" class="form-control">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                  </div>
+                </form>
+            </div>
+          </div>
+  
+        </div>
+  
+    </div>
+  </div>
+  </section>
+</div>
+  </div>
+
+</section>  

@@ -1,7 +1,6 @@
 const path = require('path');
 const ejs = require('ejs');
 const emailService = require("./utils/sendEmail");
-const { da } = require('date-fns/locale');
 console.log("Child Created", process.pid);
 process.on('message', async(msg)=>{
   try{
@@ -13,7 +12,7 @@ process.on('message', async(msg)=>{
         console.log("Slug in child: ", data.slug);
         
 
-for(i=0;i<data.hostData.length;i++){
+for(i=0;i<data.hostData.length;i++){  
  // connecting ejs file
  const emailBodyPath = path.join(__dirname, './views/joinmeeting.ejs');
 //  console.log(emailBodyPath);
@@ -23,7 +22,7 @@ for(i=0;i<data.hostData.length;i++){
  const slug= data.slug;
  const urlPath = process.env.LOCAL_HOST_URL
  const emailBody =  await ejs.renderFile(emailBodyPath, {slug, name,urlPath});
-//  console.log(emailBody);
+ console.log(emailBody);
  // sending email
   await emailService.sendEmail(email, emailBody, "Join Link")
 }
@@ -39,9 +38,10 @@ for(i=0;i<data.participantsData.length;i++){
   const urlPath = process.env.LOCAL_HOST_URL
   const slug = data.slug;
   const emailBody =  await ejs.renderFile(emailBodyPath, {slug,name,urlPath});
-  // console.log("Email Body: ", emailBody);
+  console.log("Email Body: ", emailBody);
   // sending email
   await emailService.sendEmail(email, emailBody, "Join Link")
+  console.log("mail sent");
  }
 
   }catch(e){

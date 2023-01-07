@@ -11,7 +11,7 @@ export class AuthService {
     const data = localStorage.getItem('userData');
     if(data){
       this.userData = JSON.parse(data);
-      console.log(this.userData);
+      console.log("In authservice: ", this.userData);
     }
     const adata = localStorage.getItem('adminData');
     if(adata){

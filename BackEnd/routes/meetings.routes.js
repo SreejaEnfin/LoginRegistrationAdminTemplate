@@ -243,14 +243,50 @@ mrouter.put('/delete/:id', async(req, res)=>{
     })
 
     // join meeting
-    mrouter.get('/join-meeting/:slug', (req, res)=>{
+    mrouter.get('/join-meeting', verifyToken, async(req, res)=>{
+        try{
         const slug = req.query.slug
-        res.status(200).json({
-            message:"Meeting started",
-            slug:slug
+        console.log(slug);
+        flagMeet=false
+        const userDetails = req.userDetails;
+        console.log("from verify token", req.userDetails._id);
+        console.log("UserDetails: ",userDetails);
+        let result = await Meetings.findOne({mslug:slug}, {mhost:1, mparticipants:1, mslug:1})
+  
+        const total = result.mhost.concat(result.mparticipants);
+        console.log(total);
+        console.log(total.length);
+        
+        for(var i=0;i<total.length;i++)
+        {
+            // console.log(req.userDetails._id);
+            // console.log(result.mhost[i]._id.toString());
+            // console.log(result.mparticipants[i]._id.toString())
+            if(req.userDetails._id === total[i]._id.toString()){
+                flagMeet=true;
+                console.log(total[i]._id.toString());
+            }
+            console.log(flagMeet);
+        }
+        console.log(result.mslug);
+        if(flagMeet){
+            res.status(200).send({
+                message:"Meeting started and can join now",
+                data:result.mslug
+            });
+        }else{
+            throw new Error("You are not invited");
+        }
+        
+    }catch(e){
+        res.status(400).json({
+            err:e.message
+        })
+    }
 
-        });
     })
+
+    
 
 
 module.exports = mrouter;

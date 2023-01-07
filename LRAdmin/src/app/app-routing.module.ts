@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdmindashboardComponent } from './admindashboard/admindashboard.component';
+import { AuthGuard } from './auth.guard';
+// import { ChatAppComponent } from './chat-app/chat-app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { JoinMeetingComponent } from './join-meeting/join-meeting.component';
@@ -31,7 +33,7 @@ const routes: Routes = [
     path:'reset-password/:token', component:ResetPasswordComponent
   },
   {
-    path:'join-meeting/:slug', component:JoinMeetingComponent
+    path:'join-meeting/:slug', component:JoinMeetingComponent, canActivate:[AuthGuard]
   }
 
 ];

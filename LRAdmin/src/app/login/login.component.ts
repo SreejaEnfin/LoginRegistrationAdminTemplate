@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 import { UserService } from '../user.service';
 
 @Component({
@@ -11,9 +12,11 @@ import { UserService } from '../user.service';
 export class LoginComponent {
   LoginForm!:FormGroup;
   tokenData:any;
+  urlslug:string=''
+  slugdata:any
 
 
-constructor(private router:Router, private fb:FormBuilder, private userservice:UserService){}
+constructor(private router:Router, private fb:FormBuilder, private userservice:UserService, private authservice:AuthService, private route:ActivatedRoute){}
 
 ngOnInit():void{
   this.LoginForm = this.fb.group({
@@ -27,6 +30,7 @@ ngOnInit():void{
       console.log(this.LoginForm.value);
 this.userservice.checkUser(this.LoginForm.value.uemail, this.LoginForm.value.upassword).subscribe((res:any)=>{
   console.log(res);
+
   // token from backend to a variable
   this.tokenData = res.data;
   console.log(this.tokenData)
@@ -38,6 +42,8 @@ this.userservice.checkUser(this.LoginForm.value.uemail, this.LoginForm.value.upa
   var parsedToken = JSON.parse(atobData);
   console.log(parsedToken);
   // checking whether it is admin or user and storing in localstorage accordingly
+  const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+  
   if(parsedToken.email === 'admin@gmail.com'){
     localStorage.setItem('token', this.tokenData)
     localStorage.setItem('adminData', atobData);
@@ -48,9 +54,40 @@ this.userservice.checkUser(this.LoginForm.value.uemail, this.LoginForm.value.upa
     localStorage.setItem('token',this.tokenData)
     localStorage.setItem('userData', atobData);
     this.LoginForm.reset();
-    this.router.navigate(['/dashboard']);
+    if(returnUrl){
+      this.router.navigateByUrl(returnUrl);
+      console.log(returnUrl);
+      this.urlslug = returnUrl.split('/')[2];
+      console.log(this.urlslug);
+      this.userservice.joinMeeting(this.urlslug).subscribe((res)=>{
+        console.log(Object.values(res)[1]);
+        this.slugdata = Object.values(res)[1];
+        this.userservice.sluglink=this.slugdata;
+        console.log(this.userservice.sluglink);
+      },(err)=>{
+        console.log(err);
+        if(err.error.err === "You are not invited"){
+          alert("You are not invited");
+          if(this.authservice.HaveAccess())
+    {
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminData');
+    this.router.navigate(['/login']);
   }
- 
+  else{
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    this.router.navigate(['/login']);
+  }
+  }
+          this.router.navigate(['/login']);
+        })
+    }
+    else{
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
 },(err:any)=>{
 if(err.error.Error === "Password does not match")
   alert("Password does not match")

@@ -12,6 +12,7 @@
  */
 
  @import "~@ng-select/ng-select/themes/default.theme.css";
+ @import url('https://unpkg.com/bootstrap@5.2.0/dist/css/bootstrap.min.css');
  :root {
     --blue: #4e73df;
     --indigo: #6610f2;

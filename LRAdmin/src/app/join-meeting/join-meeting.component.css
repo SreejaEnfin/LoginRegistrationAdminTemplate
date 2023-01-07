@@ -1,0 +1,44 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.mainSection{
+    width: 100%;
+    height: 100vh;
+}
+
+.totalArea{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.screen{
+    width: 100%;
+    height: 100vh;
+}
+
+.chat{
+    width: 100%;
+    height: 100vh;
+}
+
+.screen div{
+    position: fixed;
+    bottom: 0;
+    right:50%
+}
+
+/* .chatBody container {padding: 200px !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+#listOfMessages { list-style-type: none; margin: 0; padding: 0; }
+li:nth-child { padding: 0.5rem 1rem; }
+li:nth-child(odd) { background: #efefef; } */
+
+.messages{
+    flex-grow: 1;
+}

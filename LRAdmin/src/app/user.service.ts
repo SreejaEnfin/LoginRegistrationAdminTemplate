@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Chat } from './models/chat.models';
 import { Meetings } from './models/meetings.models';
 import { User } from './models/users.models';
 
@@ -13,6 +14,9 @@ export class UserService {
   meetingsurlDelete = "http://localhost:3000/meetings/delete"
   meetingsFetch = "http://localhost:3000/meetings/fetchDetails";
   limit:number = 6;
+  public sluglink!:string;
+  public slugbtn!:string;
+
   
   constructor(private http:HttpClient) { 
   }
@@ -69,6 +73,9 @@ export class UserService {
   }
 
   joinMeeting(slug:String){
+    console.log("from ts file", slug);
+    console.log(slug);
     return this.http.get("http://localhost:3000/meetings/join-meeting?slug=" +slug);
   }
+
 }

@@ -1,3 +1,4 @@
+import { state } from '@angular/animations';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -5,13 +6,13 @@ import { Meetings } from '../models/meetings.models';
 import { User } from '../models/users.models';
 import { UserService } from '../user.service';
 
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
-
   users!:User[];
   page:number=1;
   searchText:string='';
@@ -24,7 +25,9 @@ export class DashboardComponent {
   noMeetings:boolean = false;
   filterText:string='';
 
-  constructor(private router:Router, public authservice:AuthService, private userservice:UserService){}
+  constructor(private router:Router, public authservice:AuthService, private userservice:UserService){
+    
+  }
 
   ngOnInit(){
     this.getUsers();
@@ -73,9 +76,11 @@ export class DashboardComponent {
 
   joinBtn(slug:string){
     console.log(slug);
+    this.userservice.slugbtn=slug;
     this.userservice.joinMeeting(slug).subscribe((res:any)=>{
-      this.joinmeetingDetails = res;
+      this.joinmeetingDetails = res.data;
       console.log(this.joinmeetingDetails);
+      this.router.navigate(['/join-meeting/:slug']);
     }, (err)=>{
       console.log(err);
     })

@@ -25,8 +25,9 @@ export class UserService {
     return this.http.post("http://localhost:3000/users/signup", user);
   }
 
-  checkUser(uemail:string, upassword:string){
-    return this.http.get("http://localhost:3000/users/login?email=" +uemail +"&password=" +upassword);
+  checkUser(user:any){
+    console.log(user);
+    return this.http.post("http://localhost:3000/users/login", user);
   }
 
   checkForgotEmail(userEmail:String){

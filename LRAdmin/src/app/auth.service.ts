@@ -4,14 +4,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
-  userData:any;
-  adminData:any;
+  public userData:any;
+  public adminData:any;
+  public name:string=''
 
   constructor() {
     const data = localStorage.getItem('userData');
     if(data){
       this.userData = JSON.parse(data);
       console.log("In authservice: ", this.userData);
+      this.name = this.userData.name;
     }
     const adata = localStorage.getItem('adminData');
     if(adata){

@@ -30,7 +30,7 @@ export class SocketioService {
     if(this.socket){
       console.log(message);
       this.socket = io(environment.SOCKET_ENDPOINT, { transports: ['websocket'] });
-      this.socket.emit('new-message', message);
+      // this.socket.emit('new-message', message);
       console.log("in socketio:", roomName);
       this.socket.emit('join', roomName);
       this.socket.emit('my message', ({message, roomName}))
@@ -41,7 +41,7 @@ export class SocketioService {
 getMessages = () => {
   this.socket = io(environment.SOCKET_ENDPOINT, { transports: ['websocket'] });
   return Observable.create((observer:any) => {
-          this.socket.on('new-message', (message: any) => {
+          this.socket.on('my message', (message: any) => {
               observer.next(message);
               console.log("back from server", message);
           });

@@ -20,7 +20,7 @@ constructor(private router:Router, private fb:FormBuilder, private userservice:U
 
 ngOnInit():void{
   this.LoginForm = this.fb.group({
-    uemail:['', [Validators.required]],
+    uemail:['', [Validators.required, Validators.email]],
     upassword:['', [Validators.required, Validators.minLength(4)]]
   })
 }
@@ -28,7 +28,7 @@ ngOnInit():void{
   onLogin(){
     if(this.LoginForm.valid){
       console.log(this.LoginForm.value);
-this.userservice.checkUser(this.LoginForm.value.uemail, this.LoginForm.value.upassword).subscribe((res:any)=>{
+this.userservice.checkUser(this.LoginForm.value).subscribe((res:any)=>{
   console.log(res);
 
   // token from backend to a variable
@@ -67,20 +67,9 @@ this.userservice.checkUser(this.LoginForm.value.uemail, this.LoginForm.value.upa
       },(err)=>{
         console.log(err);
         if(err.error.err === "You are not invited"){
-          alert("You are not invited");
-          if(this.authservice.HaveAccess())
-    {
-    localStorage.removeItem('token');
-    localStorage.removeItem('adminData');
-    this.router.navigate(['/login']);
+          this.router.navigate(['/dashboard']);
   }
-  else{
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
-    this.router.navigate(['/login']);
-  }
-  }
-          this.router.navigate(['/login']);
+          // this.router.navigate(['/login']);
         })
     }
     else{

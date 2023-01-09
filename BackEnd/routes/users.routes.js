@@ -69,12 +69,14 @@ res.status(400).json({
 
 
 // login
-urouter.get('/login', async(req, res)=>{
-    let userData = req.query;
+urouter.post('/login', async(req, res)=>{
+    let userData = req.body;
+    console.log(userData.uemail);
     try{
-        let result = await User.findOne({uemail: userData.email});
+        let result = await User.findOne({uemail: userData.uemail});
+        console.log(result);
             if(result){
-                    if(bcrypt.compareSync(userData.password, result.upassword)){
+                    if(bcrypt.compareSync(userData.upassword, result.upassword)){
                         let payload = {
                             _id:result._id,
                             email:result.uemail,

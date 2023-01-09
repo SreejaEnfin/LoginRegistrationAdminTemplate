@@ -243,7 +243,7 @@ mrouter.put('/delete/:id', async(req, res)=>{
     })
 
     // join meeting
-    mrouter.get('/join-meeting', verifyToken, async(req, res)=>{
+mrouter.get('/join-meeting', verifyToken, async(req, res)=>{
         try{
         const slug = req.query.slug
         console.log(slug);

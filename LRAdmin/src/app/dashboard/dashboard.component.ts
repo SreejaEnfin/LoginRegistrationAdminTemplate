@@ -80,7 +80,7 @@ export class DashboardComponent {
     this.userservice.joinMeeting(slug).subscribe((res:any)=>{
       this.joinmeetingDetails = res.data;
       console.log(this.joinmeetingDetails);
-      this.router.navigate(['/join-meeting/:slug']);
+      this.router.navigate([`/join-meeting/${slug}`]);
     }, (err)=>{
       console.log(err);
     })

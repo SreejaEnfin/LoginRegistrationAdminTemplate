@@ -26,11 +26,7 @@ export class JoinMeetingComponent {
   previousUrl: string = '';
   currentUrl: string = '';
 
-  constructor(private route:ActivatedRoute, private userservice:UserService, private authservice:AuthService, private fb:FormBuilder, private socketService: SocketioService, private router:Router){
-    this.route.params.subscribe(params=>{
-      this.slug = params['slug'];
-      console.log(this.slug);
-    })
+  constructor(private userservice:UserService, private authservice:AuthService, private fb:FormBuilder, private socketService: SocketioService, private router:Router){
   }
   
   ngOnInit() {
@@ -56,20 +52,6 @@ export class JoinMeetingComponent {
   closeChat(){
     this.onClickChat=false
   }
-
-  // joinMeet(){
-  //   console.log("In join meet (ts file): ", this.slug);
-  //   this.userservice.joinMeeting(this.slug).subscribe((res:any)=>{
-  //     console.log(res);
-  //   }, (err)=>{
-  //     console.log(err);
-  //     if(err.error.err === "You are not invited"){
-  //       alert("You are not invited");
-  //       this.logoutUser();
-  //       this.router.navigate(['/login']);
-  //     }
-  //   })
-  // }
 
   logoutUser(){
     if(this.authservice.HaveAccess())

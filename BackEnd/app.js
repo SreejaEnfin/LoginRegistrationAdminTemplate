@@ -26,11 +26,11 @@ const port = process.env.PORT;
   io.on('connection', (socket) => {
     console.log(socket.id);
 
-    socket.on('new-message', (message)=>{
-      console.log("message:", message);
-      // socket.to(roomName).emit('new-message', message);;
-      io.emit("new-message", message)
-    })
+    // socket.on('new-message', (message)=>{
+    //   console.log("message:", message);
+    //   // socket.to(roomName).emit('new-message', message);;
+    //   io.emit("new-message", message)
+    // })
 
     socket.on('join', (roomName)=>{
       console.log("joined to room:", roomName);

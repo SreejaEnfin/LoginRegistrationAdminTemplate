@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { Meetings } from '../models/meetings.models';
 import { User } from '../models/users.models';
+import { SocketioService } from '../socketio.service';
 import { UserService } from '../user.service';
 
 
@@ -24,8 +25,9 @@ export class DashboardComponent {
   changeColor:number=1;
   noMeetings:boolean = false;
   filterText:string='';
+  roomNamebtn:string=''
 
-  constructor(private router:Router, public authservice:AuthService, private userservice:UserService){
+  constructor(private router:Router, public authservice:AuthService, private userservice:UserService, private socketservice:SocketioService){
     
   }
 
@@ -76,14 +78,8 @@ export class DashboardComponent {
 
   joinBtn(slug:string){
     console.log(slug);
-    this.userservice.slugbtn=slug;
-    this.userservice.joinMeeting(slug).subscribe((res:any)=>{
-      this.joinmeetingDetails = res.data;
-      console.log(this.joinmeetingDetails);
+    this.userservice.urlSlug=slug;
       this.router.navigate([`/join-meeting/${slug}`]);
-    }, (err)=>{
-      console.log(err);
-    })
   }
 
   pageChange(i:any){
@@ -96,8 +92,7 @@ export class DashboardComponent {
     });
   }
 
-  Nextpage(){
-      
+  Nextpage(){ 
     if(this.current < this.pages.length)
     {
       this.current++;

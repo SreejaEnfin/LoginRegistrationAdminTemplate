@@ -33,7 +33,7 @@ const routes: Routes = [
     path:'reset-password/:token', component:ResetPasswordComponent
   },
   {
-    path:'join-meeting/:slug', component:JoinMeetingComponent, canActivate:[AuthGuard]
+    path:'join-meeting/:slug', component:JoinMeetingComponent
   }
 
 ];

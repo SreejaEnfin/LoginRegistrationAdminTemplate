@@ -107,13 +107,15 @@ mrouter.get('/', async(req, res)=>{
         res.status(200).json({
             message:"Successfull collected data",
             data:results,
-            pageDown:pageDown
+            pageDown:pageDown,
+            success:true
         });
        
     }catch(e){
         res.status(400).json({
             message:"Failed to collect data",
-            error:e.message
+            error:e.message,
+            success:false
         })
     }
 })
@@ -152,14 +154,16 @@ mrouter.get('/fetchdetails', verifyToken, async(req, res)=>{
         res.status(200).json({
             message:"Successfull collected data",
             data:results,
-            pageDown:pageDown
+            pageDown:pageDown,
+            success:true
         });
         
         }
         catch(e){
             res.status(400).json({
                 message:"Failed to collect data",
-                error:e.message
+                error:e.message,
+                success:false
             })
         }
     })
@@ -171,7 +175,7 @@ mrouter.delete('/:id', async(req, res)=>{
     if(objectId.isValid(req.params.id)){
         let result = await Meetings.findByIdAndRemove(req.params.id);
         res.json({
-            status:true,
+            success:true,
             message:"Successfully deleted",
             data:result
         })
@@ -181,7 +185,7 @@ mrouter.delete('/:id', async(req, res)=>{
     }
 }catch(e){
 res.json({
-    status:false,
+    success:false,
     error:e.message
 })
 }
@@ -202,7 +206,8 @@ mrouter.put('/:id', async(req, res)=>{
             let result = await Meetings.findByIdAndUpdate(req.params.id, {$set:meetings}, {new:true});
             res.status(200).json({
                 message:"Successfully updated",
-                data:result
+                data:result,
+                success:true
             })
         }
         else{
@@ -211,7 +216,9 @@ mrouter.put('/:id', async(req, res)=>{
     }catch(e){
         res.status(400).json({
             message:Error.message,
-            err:e.message
+            err:e.message,
+            success:false
+        
         })
     }
     })
@@ -228,7 +235,7 @@ mrouter.put('/delete/:id', async(req, res)=>{
             res.status(200).json({
                 message:"Meeting deleted and status changed to false",
                 data:result,
-
+                success:true
             })
         }
         else{
@@ -237,7 +244,8 @@ mrouter.put('/delete/:id', async(req, res)=>{
     }catch(e){
         res.status(400).json({
             message:Error.message,
-            err:e.message
+            err:e.message,
+            success:false
         })
     }
     })
@@ -247,40 +255,19 @@ mrouter.get('/join-meeting', verifyToken, async(req, res)=>{
         try{
         const slug = req.query.slug
         console.log(slug);
-        flagMeet=false
         const userDetails = req.userDetails;
         console.log("from verify token", req.userDetails._id);
         console.log("UserDetails: ",userDetails);
-        let result = await Meetings.findOne({mslug:slug}, {mhost:1, mparticipants:1, mslug:1})
-  
-        const total = result.mhost.concat(result.mparticipants);
-        console.log(total);
-        console.log(total.length);
-        
-        for(var i=0;i<total.length;i++)
-        {
-            // console.log(req.userDetails._id);
-            // console.log(result.mhost[i]._id.toString());
-            // console.log(result.mparticipants[i]._id.toString())
-            if(req.userDetails._id === total[i]._id.toString()){
-                flagMeet=true;
-                console.log(total[i]._id.toString());
-            }
-            console.log(flagMeet);
-        }
-        console.log(result.mslug);
-        if(flagMeet){
+        let result = await Meetings.findOne({$and:[{mslug:slug}, {$or:[{mhost:req.userDetails._id},{ mparticipants:req.userDetails._id }]}]}, {mhost:1, mparticipants:1, mslug:1})
+        console.log(result);
             res.status(200).send({
                 message:"Meeting started and can join now",
-                data:result.mslug
+                "success":true,
             });
-        }else{
-            throw new Error("You are not invited");
-        }
-        
     }catch(e){
         res.status(400).json({
-            err:e.message
+            err:"You are not invited",
+            "success":false
         })
     }
 

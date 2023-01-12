@@ -156,7 +156,7 @@ urouter.post('/forgot-password', async(req, res)=>{
 
                 let resultData = await User.findByIdAndUpdate(result._id, {$set:newData}, {new:true});
                 res.status(200).json({
-                    message:"User found",
+                    "message":"User found",
                     data:forgotToken,
                     updated:resultData
                 })
@@ -187,6 +187,7 @@ try{
         upassword:hash}});
         res.status(200).json({
             message:"Verified and updated successfully",
+            "success":true
         })
         
     }
@@ -207,7 +208,7 @@ urouter.delete('/:id', async(req, res)=>{
     if(objectId.isValid(req.params.id)){
         let result = await User.findByIdAndRemove(req.params.id);
         res.json({
-            status:true,
+            "success":true,
             message:"Successfully deleted",
             data:result
         })
@@ -217,7 +218,7 @@ urouter.delete('/:id', async(req, res)=>{
     }
 }catch(e){
 res.json({
-    status:false,
+    "success":false,
     error:e.message
 })
 }
@@ -239,7 +240,8 @@ urouter.put('/:id', async(req, res)=>{
                 { new: true });
                 res.status(200).json({
                     message:'Data updated',
-                    data:result
+                    data:result,
+                    "success":true
                   });
         }
         else{
@@ -247,7 +249,7 @@ urouter.put('/:id', async(req, res)=>{
         }
     }catch(e){
     res.json({
-        status:false,
+        success:false,
         error:e.message
     })
     }

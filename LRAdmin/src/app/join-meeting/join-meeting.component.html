@@ -27,8 +27,17 @@
             <div class="card-body chatBody" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
               <div class="form-group container">
                 <ul id="listOfMessages">
-                    <li class="singleMessage" *ngFor="let message of messageList">
-                        {{message}}
+                  <li class="singleMessage" *ngFor="let i of messagesList">
+                    <!-- {{i.date | date: 'hh:mm:ss'}} -->
+                    &nbsp;  <span class="fw-bold text-primary" *ngFor="let im of i['sender']">{{im['ufname']}}</span>&nbsp; &nbsp; &nbsp; &nbsp;<small>{{i.date | date:"HH:mm"}}</small>
+                    <br><span class="text-dark">&nbsp; {{i.message}} </span>
+                  </li>
+              </ul>
+                <ul id="listOfMessages" *ngFor="let m of messageList">
+                    <li class="singleMessage" >
+                      <!-- {{i.date | date: 'hh:mm:ss'}} -->
+                      &nbsp;  <span class="fw-bold text-primary">{{m.sender}}</span>&nbsp; &nbsp; &nbsp; &nbsp;<small>{{today | date:"HH:mm"}}</small>
+                      <br><span class="text-dark">&nbsp; {{m.message}}</span>
                     </li>
                 </ul>
             
@@ -36,7 +45,6 @@
             </div>
             <div class="messages"></div>
             <div class="card-footer text-muted  p-3">
-              
                 <form class="p-2" [formGroup]="chatForm" (ngSubmit)="sendmsgs()">
                   <div class="form-group d-flex justify-content-between" style="position: fixed; bottom: 10px;">
                     <input type="text" formControlName="message" class="form-control">

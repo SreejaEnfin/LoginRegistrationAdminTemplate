@@ -16,7 +16,17 @@ export class LoginComponent {
   slugdata:any
 
 
-constructor(private router:Router, private fb:FormBuilder, private userservice:UserService, private authservice:AuthService, private route:ActivatedRoute){}
+constructor(private router:Router, private fb:FormBuilder, private userservice:UserService, private authservice:AuthService, private route:ActivatedRoute){
+  if(this.userservice.urlSlug){
+    this.urlslug = this.userservice.urlSlug;
+    console.log(this.urlslug);
+  }
+  else
+  {
+    this.urlslug=''
+  }
+  
+}
 
 ngOnInit():void{
   this.LoginForm = this.fb.group({
@@ -42,7 +52,7 @@ this.userservice.checkUser(this.LoginForm.value).subscribe((res:any)=>{
   var parsedToken = JSON.parse(atobData);
   console.log(parsedToken);
   // checking whether it is admin or user and storing in localstorage accordingly
-  const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+  // const returnUrl = this.route.snapshot.queryParams['returnUrl'];
   
   if(parsedToken.email === 'admin@gmail.com'){
     localStorage.setItem('token', this.tokenData)
@@ -54,29 +64,16 @@ this.userservice.checkUser(this.LoginForm.value).subscribe((res:any)=>{
     localStorage.setItem('token',this.tokenData)
     localStorage.setItem('userData', atobData);
     this.LoginForm.reset();
-    if(returnUrl){
-      this.router.navigateByUrl(returnUrl);
-      console.log(returnUrl);
-      this.urlslug = returnUrl.split('/')[2];
-      console.log(this.urlslug);
-      this.userservice.joinMeeting(this.urlslug).subscribe((res)=>{
-        console.log(Object.values(res)[1]);
-        this.slugdata = Object.values(res)[1];
-        this.userservice.sluglink=this.slugdata;
-        console.log(this.userservice.sluglink);
-      },(err)=>{
-        console.log(err);
-        if(err.error.err === "You are not invited"){
-          this.router.navigate(['/dashboard']);
-  }
-          // this.router.navigate(['/login']);
-        })
+    console.log(this.urlslug);
+    if(this.urlslug!==''){
+      this.router.navigate([`/join-meeting/${this.urlslug}`]);
+      this.userservice.urlSlug = '';
+      this.urlslug=''
     }
     else{
       this.router.navigate(['/dashboard']);
     }
   }
-
 },(err:any)=>{
 if(err.error.Error === "Password does not match")
   alert("Password does not match")

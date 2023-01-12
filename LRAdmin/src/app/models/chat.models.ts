@@ -1,4 +1,6 @@
 export interface Chat{
     _id:string,
-    msg:string
+    message:string,
+    date:Date,
+    sender:[]
 }

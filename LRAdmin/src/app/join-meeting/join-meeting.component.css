@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+/* body{
+    width: 100%;
+    height: 100vh;
+} */
+
 .mainSection{
     width: 100%;
     height: 100vh;
@@ -35,14 +40,117 @@
     right:50%
 }
 
-/* .chatBody container {padding: 200px !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-#listOfMessages { list-style-type: none; margin: 0; padding: 0; }
-li:nth-child { padding: 0.5rem 1rem; }
-li:nth-child(odd) { background: #efefef; } */
-
 .messages{
     flex-grow: 1;
 }
 #listOfMessages{
     list-style: none;
 } 
+
+div.select {
+    display: inline-block;
+    margin: 0 0 1em 0;
+}
+
+.select{
+    border: 1px solid black;
+    padding: 20px 30px;
+    border-radius: 10px;
+}
+
+/* coding for start page of meet starts here */
+
+.webcamArea{
+    width: 100%;
+    height: 100vh;
+}
+
+.entrySection{
+    border: 1px gray black;
+    width: 90%;
+    margin: auto;
+    background-color: white;
+    border-radius: 25px;
+    height: 750px;
+}
+
+.entrySection p{
+    padding-top: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+}
+
+.selectionArea{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 80px 200px;
+    height: 600px
+}
+
+.entryNav{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.entryNavHeading{
+    font-size: 32px;
+    color: black;
+}
+
+.entryNavBtn button{
+font-size: 20px;
+}
+
+.entryVideo{
+    width: 700px;
+    height: 550px;
+    position: relative;
+}
+
+.selectOption{
+    border: none;
+    background:none;
+}
+
+.joinSubmitBtn{
+    background-color: lightblue;
+    color: black;
+    padding: 10px 20px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.optionsJoin{
+    width: 400px;
+}
+
+.meetingIcon{
+    font-size: 30px;
+    color: black;
+}
+
+.videoBtn{
+    position: absolute;
+    z-index: 10;
+    right: 62%;
+    bottom: 170px;
+    cursor: pointer;
+    background: none;
+}
+
+.videoIcon{
+    border: 2px solid white;
+    border-radius: 50%;
+    padding: 5px 8px;
+    font-size: 32px;
+    color: lightblue;
+}
+
+.selectOption option{
+    border: white;
+    width: 100%;
+}

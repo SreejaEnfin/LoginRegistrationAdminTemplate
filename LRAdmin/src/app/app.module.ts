@@ -22,6 +22,7 @@ import { JoinMeetingComponent } from './join-meeting/join-meeting.component';
 import { SocketioService } from './socketio.service';
 import { SocketIoModule, SocketIoConfig} from 'ngx-socket-io';
 import { CommonModule } from '@angular/common';
+import { WebcamModule } from 'ngx-webcam';
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 
@@ -49,8 +50,8 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     FormsModule,
     NgSelectModule,
     SocketIoModule.forRoot(config),
-    CommonModule
-
+    CommonModule,
+    WebcamModule
   ],
   providers: [{provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorService, multi:true}, SocketioService],
   bootstrap: [AppComponent]

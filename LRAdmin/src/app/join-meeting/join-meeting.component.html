@@ -1,10 +1,78 @@
-<section class="mainSection col-12">
+<section class="webSection">
+
+    <section [class.d-none]="showScreen" [class.d-block]="!showScreen" style="background-color: lightblue;" class="webcamArea">
+    <div class="entryNav container-fluid p-5">
+      <div class="fw-bold text-dark entryNavHeading">MeEt</div>
+      <div class="entryNavBtn">
+        <button class="btn btn-outline-dark text-dark me-3 px-2 py-1">Login</button>
+        <button class="btn btn-dark text-light px-2 py-1">Sign Up</button>
+      </div>
+    </div>
+
+    <section class="entrySection">
+<div class="ms-5">
+  <p><i class="uil uil-arrow-left"></i> Audio and Video Check-up</p>
+</div>
+       <div class="selectionArea"> 
+      <div>
+        <video id="video"  autoplay class="bg-dark entryVideo"></video>
+        <div class="videoBtn "> <i *ngIf="!this.noVideoBtn" class="uil uil-video videoIcon" [ngStyle]="{'background-color':noVideoBtn ? 'red' : ''}" (click)="noVideo()"></i> <i *ngIf="this.noVideoBtn" class="uil uil-video-slash videoIcon" [ngStyle]="{'background-color':noVideoBtn ? 'red' : ''}" (click)="noVideo()"></i> &nbsp; &nbsp;<i class="uil uil-microphone videoIcon" *ngIf="!this.noAudioBtn" (click)="noAudio()" [ngStyle]="{'background-color':noAudioBtn ? 'red' : '' }"></i><i class="uil uil-microphone-slash videoIcon" *ngIf="this.noAudioBtn" (click)="noAudio()" [ngStyle]="{'background-color':noAudioBtn ? 'red' : '' }"></i></div>
+      </div>
+
+      <div id="container">
+        <div class="d-flex flex-column optionsJoin">
+        <div class="select">
+          <i class="uil uil-video meetingIcon"></i>
+          <select  class="selectOption" #videoI (click)="changeVideoInput(videoI.value)">
+            <option *ngFor="let i of videoInput" value="{{i.id}}" ><b>{{i.label}}</b></option>
+            </select>
+        </div>
+    
+        <div class="select">
+          <i class="uil uil-microphone meetingIcon"></i>
+          <select id="audioInput" class="selectOption" #audioI (click)="changeAudioInput(audioI.value)">
+            <option *ngFor="let i of audioInput" value="{{i.id}}" ><b>{{i.label}}</b></option>
+          </select>
+        </div>
+    
+        <div class="select">
+          <i class="uil uil-camera meetingIcon"></i>
+          <select id="audioOutput" class="selectOption" #audioO (change)="changeAudioOutput(audioO.value)">
+            <option *ngFor="let i of audioOutput" value="{{i.id}}" [selected]="i.label === 'default'"><b>{{i.label}}</b></option>
+            <!-- [selected]="i === 'default'" -->
+            </select>
+        </div>
+
+        <div class="text-center">
+          <audio id="audio" #audio src="../../assets/sample-3s.mp3"></audio>
+          <i class="uil uil-volume" style="color: lightblue; font-size: 20px"></i> <span style="color: lightblue; font-size: 20px; cursor: pointer;" class="fw-bold" (click)="audio.play()">Test Speaker</span>
+        </div>
+        <br>
+
+        <div class="">
+          <button class="btn joinSubmitBtn" (click)="joinMeetingStart()">Join Meeting</button>        
+        </div>
+      </div>
+    
+        
+    </div>
+  </div>
+
+    </section>
+
+</section>
+<!-- webSection -->
+
+<!-- meeting section -->
+<section class="mainSection col-12" [class.d-none]="!showScreen" [class.d-block]="showScreen">
   <div class="container-fluid totalArea col-12">
      
     <div class="screen bg-dark"  [class.col-9]="onClickChat">
       <div>
       <button  (click)="chat()" type="submit">Chat</button>
       <button  (click)="logoutUser()" type="submit">Logout</button>
+        <!-- <button class="btn joinSubmitBtn" (click)="joinMeetingStart()">Back</button>         -->
+
     </div>
     </div>
    

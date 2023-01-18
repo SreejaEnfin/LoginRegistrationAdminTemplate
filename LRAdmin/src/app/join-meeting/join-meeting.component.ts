@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -15,6 +15,8 @@ import { WebcamImage } from 'ngx-webcam';
   styleUrls: ['./join-meeting.component.css']
 })
 export class JoinMeetingComponent implements OnInit {
+  @ViewChild('videoElement')videoElement!: ElementRef;
+  @ViewChild('audioElement')audioElement!:ElementRef;
   slug: any
   onClickChat: boolean = false;
   model = new ChatMessage("");
@@ -41,13 +43,21 @@ export class JoinMeetingComponent implements OnInit {
 
   public webcamImage: WebcamImage | undefined;
   videoRef: any;
+  audioRef:any;
 
   Devices: any
+
+  videoInpSelected: any
+  audioInpSelected: any
+  audioOutSelected: any
 
 
   videoInput: any[] = [];
   audioInput: any[] = [];
   audioOutput: any[] = [];
+
+  showAudioMessage:boolean=false;
+  displayValue='';
 
 
   constructor(private userservice: UserService, private authservice: AuthService, private socketservice: SocketioService, private fb: FormBuilder, private socketService: SocketioService, private router: Router, private route: ActivatedRoute) {
@@ -57,11 +67,18 @@ export class JoinMeetingComponent implements OnInit {
       this.urlslug = params['slug'];
     })
     console.log(this.urlslug);
+  }
 
-
+  ngAfterViewInit(){
+    console.log(this.videoElement.nativeElement);
+    this.videoRef = this.videoElement.nativeElement;
+    console.log(this.videoRef);
+    this.audioRef = this.audioElement.nativeElement
+    console.log(this.audioRef);
   }
 
   ngOnInit() {
+    this.displayValue = '';
     this.userservice.urlSlug = this.urlslug;
     this.socketService.getMessage().subscribe((data) => {
       console.log(data);
@@ -90,9 +107,8 @@ export class JoinMeetingComponent implements OnInit {
       else
         this.router.navigate(['/dashboard']);
     })
-    this.videoRef = document.getElementById('video');
-    console.log(this.videoRef);
-    this.setUpCamera();
+    
+        this.setUpCamera();
     this.getDevices();
   }
 
@@ -165,6 +181,7 @@ export class JoinMeetingComponent implements OnInit {
       audio: true
     }).then((streamData) => {
       console.log(streamData);
+      console.log(this.videoRef);
       this.videoRef.srcObject = streamData;
     });
   }
@@ -181,13 +198,13 @@ export class JoinMeetingComponent implements OnInit {
           option.value = deviceInfo.deviceId;
           if (deviceInfo.kind === 'audioinput') {
             console.log(deviceInfo.label);
-            this.audioInput.push({label:deviceInfo.label, id:deviceInfo.deviceId});
+            this.audioInput.push({ label: deviceInfo.label, id: deviceInfo.deviceId });
             console.log(this.audioInput);
           } else if (deviceInfo.kind === 'audiooutput') {
-            this.audioOutput.push({label:deviceInfo.label, id:deviceInfo.deviceId});
+            this.audioOutput.push({ label: deviceInfo.label, id: deviceInfo.deviceId });
             console.log(this.audioOutput);
           } else if (deviceInfo.kind === 'videoinput') {
-            this.videoInput.push({label:deviceInfo.label, id:deviceInfo.deviceId});
+            this.videoInput.push({ label: deviceInfo.label, id: deviceInfo.deviceId });
             console.log(this.videoInput);
           } else {
             console.log('Some other kind of source/device: ', deviceInfo);
@@ -196,31 +213,56 @@ export class JoinMeetingComponent implements OnInit {
       })
   }
 
-  changeVideoInput(value:any){
-    console.log(value); 
-    if (this.videoRef.srcObject) {
-      this.videoRef.srcObject.getTracks().forEach((videoTrack: any) => {
-        // console.log(videoTrack);
-        videoTrack.stop();
-        console.log(videoTrack);
-      });
+  changeVideoInput(value: any) {
+    console.log(value);
+    this.videoInpSelected = value;
+    if(this.videoInpSelected){
+    this.start();
     }
   }
 
 
   changeAudioInput(value: any) {
     console.log(value);
-    if (this.videoRef.srcObject) {
-      this.videoRef.srcObject.getTracks().forEach((audioTrack: any) => {
-        audioTrack.stop();
-        // console.log(audioTrack);
-        console.log(audioTrack);
-      });
+    this.audioInpSelected = value;
+    if(this.audioInpSelected){
+    this.start();
     }
   }
+  
+  async start()
+  {
+    try{
+      console.log(this.videoInpSelected);
+      console.log(this.audioInpSelected);
+      const constraints = {
+        audio:{deviceId:this.audioInpSelected? {exact:this.audioInpSelected}: undefined},
+        video:{deviceId:this.videoInpSelected? {exact:this.videoInpSelected}:undefined}
+      }  
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const deviceInfo = await this.gotStream(stream);
+    this.getDevices();
+    }catch(e){
+      console.log(e);
+    }
+    
+  }
+
+  gotStream(stream:any){
+    console.log(this.videoRef);
+    this.videoRef.srcObject = stream;
+    console.log(this.videoRef.srcObject);
+    return navigator.mediaDevices.enumerateDevices();
+  }
+
+  handleError(error:any){
+    console.log(error.message, error.name);
+  }
+
 
   changeAudioOutput(value: any) {
     console.log(value);
+    this.audioOutSelected=value;
     if (this.videoRef.srcObject) {
       this.videoRef.srcObject.getTracks().forEach((audioTrack: any) => {
         console.log(audioTrack);
@@ -229,29 +271,36 @@ export class JoinMeetingComponent implements OnInit {
     this.changeAudioDestination(value);
   }
 
-  changeAudioDestination(value:any){
+  changeAudioDestination(value: any) {
     console.log(value);
-    const audios = document.getElementById('audio');
-    this.attachSinkId(audios, value);
+    this.attachSinkId(this.audioRef, value);
   }
 
-  attachSinkId(element:any, sinkId:any){
+  attachSinkId(element: any, sinkId: any) {
     if (typeof element.sinkId !== 'undefined') {
-    element.setSinkId(sinkId)
+      element.setSinkId(sinkId)
         .then(() => {
           console.log(`Success, audio output device attached: ${sinkId}`);
         })
-        .catch((error:any) => {
+        .catch((error: any) => {
           let errorMessage = error;
           if (error.name === 'SecurityError') {
             errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
           }
           console.error(errorMessage);
-          // Jump back to first output device in the list as it's the default.
-          // audioOutputSelect.selectedIndex = 0;
         });
-  } else {
-    console.warn('Browser does not support output device selection.');
+    } else {
+      console.warn('Browser does not support output device selection.');
+    }
   }
+
+  display(){
+    this.showAudioMessage = true;
+    this.displayValue="Playing";
+  }
+
+  nodisplay(){
+    this.showAudioMessage = false;
+    this.displayValue = "Ended"
   }
 }

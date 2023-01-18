@@ -13,24 +13,24 @@
 <div class="ms-5">
   <p><i class="uil uil-arrow-left"></i> Audio and Video Check-up</p>
 </div>
-       <div class="selectionArea"> 
+       <div class="selectionArea" #selectionAreax> 
       <div>
-        <video id="video"  autoplay class="bg-dark entryVideo"></video>
-        <div class="videoBtn "> <i *ngIf="!this.noVideoBtn" class="uil uil-video videoIcon" [ngStyle]="{'background-color':noVideoBtn ? 'red' : ''}" (click)="noVideo()"></i> <i *ngIf="this.noVideoBtn" class="uil uil-video-slash videoIcon" [ngStyle]="{'background-color':noVideoBtn ? 'red' : ''}" (click)="noVideo()"></i> &nbsp; &nbsp;<i class="uil uil-microphone videoIcon" *ngIf="!this.noAudioBtn" (click)="noAudio()" [ngStyle]="{'background-color':noAudioBtn ? 'red' : '' }"></i><i class="uil uil-microphone-slash videoIcon" *ngIf="this.noAudioBtn" (click)="noAudio()" [ngStyle]="{'background-color':noAudioBtn ? 'red' : '' }"></i></div>
+        <video id="video" #videoElement autoplay class="bg-dark entryVideo"></video>
+        <div class="videoBtn"> <i *ngIf="!this.noVideoBtn" class="uil uil-video videoIcon" [ngStyle]="{'background-color':noVideoBtn ? 'red' : ''}" (click)="noVideo()"></i> <i *ngIf="this.noVideoBtn" class="uil uil-video-slash videoIcon" [ngStyle]="{'background-color':noVideoBtn ? 'red' : ''}" (click)="noVideo()"></i> &nbsp; &nbsp;<i class="uil uil-microphone videoIcon" *ngIf="!this.noAudioBtn" (click)="noAudio()" [ngStyle]="{'background-color':noAudioBtn ? 'red' : '' }"></i><i class="uil uil-microphone-slash videoIcon" *ngIf="this.noAudioBtn" (click)="noAudio()" [ngStyle]="{'background-color':noAudioBtn ? 'red' : '' }"></i></div>
       </div>
 
       <div id="container">
         <div class="d-flex flex-column optionsJoin">
         <div class="select">
           <i class="uil uil-video meetingIcon"></i>
-          <select  class="selectOption" #videoI (click)="changeVideoInput(videoI.value)">
+          <select  class="selectOption" #videoI (change)="changeVideoInput(videoI.value)">
             <option *ngFor="let i of videoInput" value="{{i.id}}" ><b>{{i.label}}</b></option>
             </select>
         </div>
     
         <div class="select">
           <i class="uil uil-microphone meetingIcon"></i>
-          <select id="audioInput" class="selectOption" #audioI (click)="changeAudioInput(audioI.value)">
+          <select id="audioInput" class="selectOption" #audioI (change)="changeAudioInput(audioI.value)">
             <option *ngFor="let i of audioInput" value="{{i.id}}" ><b>{{i.label}}</b></option>
           </select>
         </div>
@@ -38,14 +38,13 @@
         <div class="select">
           <i class="uil uil-camera meetingIcon"></i>
           <select id="audioOutput" class="selectOption" #audioO (change)="changeAudioOutput(audioO.value)">
-            <option *ngFor="let i of audioOutput" value="{{i.id}}" [selected]="i.label === 'default'"><b>{{i.label}}</b></option>
-            <!-- [selected]="i === 'default'" -->
+            <option *ngFor="let i of audioOutput" value="{{i.id}}"><b>{{i.label}}</b></option>
             </select>
         </div>
 
         <div class="text-center">
-          <audio id="audio" #audio src="../../assets/sample-3s.mp3"></audio>
-          <i class="uil uil-volume" style="color: lightblue; font-size: 20px"></i> <span style="color: lightblue; font-size: 20px; cursor: pointer;" class="fw-bold" (click)="audio.play()">Test Speaker</span>
+          <audio id="audio" #audioElement src="../../assets/sample-3s.mp3" (play)="display()" (ended)="nodisplay()"></audio>
+          <i class="uil uil-volume" style="color: lightblue; font-size: 20px" (click)="audioElement.play()"></i> <span style="color: lightblue; font-size: 20px; cursor: pointer;" class="fw-bold"  *ngIf="this.showAudioMessage">{{this.displayValue}}</span> <span style="color: lightblue; font-size: 20px; cursor: pointer;" class="fw-bold"  *ngIf="!this.showAudioMessage">{{this.displayValue}}</span> 
         </div>
         <br>
 

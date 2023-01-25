@@ -34,10 +34,19 @@
     overflow:scroll;
 }
 
-.screen div{
+/* .screen div{
     position: fixed;
     bottom: 0;
     right:50%
+} */
+
+.screenOptions{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    padding: 20px;
+    opacity: 0.9;
 }
 
 .messages{
@@ -137,7 +146,7 @@ font-size: 20px;
     position: absolute;
     z-index: 10;
     right: 62%;
-    bottom: 170px;
+    bottom: 190px;
     cursor: pointer;
     background: none;
 }
@@ -153,4 +162,14 @@ font-size: 20px;
 .selectOption option{
     border: white;
     width: 100%;
+}
+
+.meetingIcons{
+    /* border: 1px solid white; */
+    padding: 10px;
+    font-size: 25px;
+    font-weight: 500;
+    /* border-radius: 90%; */
+    /* color: white; */
+    cursor: pointer;
 }

@@ -7,7 +7,7 @@ import { UserService } from '../user.service';
 import { ChatMessage } from '../chat-message';
 import { Chat } from '../models/chat.models';
 import { WebcamImage } from 'ngx-webcam';
-
+import adapter from "webrtc-adapter";
 
 @Component({
   selector: 'app-join-meeting',
@@ -15,8 +15,13 @@ import { WebcamImage } from 'ngx-webcam';
   styleUrls: ['./join-meeting.component.css']
 })
 export class JoinMeetingComponent implements OnInit {
-  @ViewChild('videoElement')videoElement!: ElementRef;
-  @ViewChild('audioElement')audioElement!:ElementRef;
+  @ViewChild('videoElement') videoElement!: ElementRef;
+  @ViewChild('audioElement') audioElement!: ElementRef;
+  @ViewChild('options') options!: ElementRef;
+  @ViewChild('screenOptions') screenOptions!: ElementRef;
+  @ViewChild('errorMsg') errormsg!: ElementRef
+  @ViewChild('screenShareVideo') screenShareVideo!: ElementRef;
+  @ViewChild('screenShareIcon') screenShareIcon!: ElementRef;
   slug: any
   onClickChat: boolean = false;
   model = new ChatMessage("");
@@ -43,9 +48,10 @@ export class JoinMeetingComponent implements OnInit {
 
   public webcamImage: WebcamImage | undefined;
   videoRef: any;
-  audioRef:any;
+  audioRef: any;
 
   Devices: any
+  showStopScreenLabel: boolean = false;
 
   videoInpSelected: any
   audioInpSelected: any
@@ -56,9 +62,31 @@ export class JoinMeetingComponent implements OnInit {
   audioInput: any[] = [];
   audioOutput: any[] = [];
 
-  showAudioMessage:boolean=false;
-  displayValue='';
+  showAudioMessage: boolean = false;
 
+  isHD: boolean = false;
+
+  volumeMeterEl: any
+  distortion: any;
+  WIDTH: any;
+  HEIGHT: any;
+
+  maxLength: any
+  public maxValue: any
+  allpids: any
+
+  public valueToColor: any | undefined;
+  valueToColorsHTML: any;
+
+  errorMessage: any;
+  screenVideo: any;
+  screenIcon: any;
+
+  screenShare: boolean = false;
+  noStream: boolean = false;
+
+  stream: any;
+  screenShareStream: any;
 
   constructor(private userservice: UserService, private authservice: AuthService, private socketservice: SocketioService, private fb: FormBuilder, private socketService: SocketioService, private router: Router, private route: ActivatedRoute) {
     this.urlslug = ''
@@ -69,16 +97,26 @@ export class JoinMeetingComponent implements OnInit {
     console.log(this.urlslug);
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     console.log(this.videoElement.nativeElement);
     this.videoRef = this.videoElement.nativeElement;
     console.log(this.videoRef);
     this.audioRef = this.audioElement.nativeElement
     console.log(this.audioRef);
+    this.errorMessage = this.errormsg.nativeElement;
+    console.log(this.errorMessage);
+    this.screenVideo = this.screenShareVideo.nativeElement;
+    console.log(this.screenVideo);
+    this.screenVideo.addEventListener('onended', () => {
+      this.noShare();
+    })
+    this.screenIcon = this.screenShareIcon.nativeElement;
+    console.log(this.screenIcon);
   }
 
   ngOnInit() {
-    this.displayValue = '';
+    this.maxValue = 50;
+    this.isHD = false;
     this.userservice.urlSlug = this.urlslug;
     this.socketService.getMessage().subscribe((data) => {
       console.log(data);
@@ -107,9 +145,12 @@ export class JoinMeetingComponent implements OnInit {
       else
         this.router.navigate(['/dashboard']);
     })
-    
-        this.setUpCamera();
+
+    // this.setUpCamera();
+    this.valueToColorsHTML = this.start();
+
     this.getDevices();
+
   }
 
 
@@ -158,32 +199,25 @@ export class JoinMeetingComponent implements OnInit {
   noVideo() {
     this.noVideoBtn = !this.noVideoBtn;
     console.log(this.noVideoBtn);
-    this.videoRef.srcObject.getVideoTracks().forEach((element: any) => {
-      element.enabled = !this.noVideoBtn;
-    });
+    this.start();
   }
 
   noAudio() {
     this.noAudioBtn = !this.noAudioBtn;
     console.log(this.noAudioBtn);
-    this.videoRef.srcObject.getAudioTracks().forEach((element: any) => {
-      element.enabled = !this.noAudioBtn;
-    });
+    this.start();
   }
 
   joinMeetingStart() {
     this.showScreen = !this.showScreen
-  }
-
-  setUpCamera() {
-    navigator.mediaDevices.getUserMedia({
-      video: { width: 700, height: 550 },
-      audio: true
-    }).then((streamData) => {
-      console.log(streamData);
-      console.log(this.videoRef);
-      this.videoRef.srcObject = streamData;
-    });
+    this.stream.getVideoTracks()[0].stop();
+    this.stream.getAudioTracks()[0].stop();
+    console.log(this.showScreen);
+    if (!this.showScreen) {
+      this.screenVideo.srcObject = null;
+      this.closeChat();
+      this.screenShare = false;
+    }
   }
 
   getDevices() {
@@ -216,8 +250,8 @@ export class JoinMeetingComponent implements OnInit {
   changeVideoInput(value: any) {
     console.log(value);
     this.videoInpSelected = value;
-    if(this.videoInpSelected){
-    this.start();
+    if (this.videoInpSelected) {
+      this.start();
     }
   }
 
@@ -225,44 +259,87 @@ export class JoinMeetingComponent implements OnInit {
   changeAudioInput(value: any) {
     console.log(value);
     this.audioInpSelected = value;
-    if(this.audioInpSelected){
-    this.start();
+    if (this.audioInpSelected) {
+      this.start();
     }
-  }
-  
-  async start()
-  {
-    try{
-      console.log(this.videoInpSelected);
-      console.log(this.audioInpSelected);
-      const constraints = {
-        audio:{deviceId:this.audioInpSelected? {exact:this.audioInpSelected}: undefined},
-        video:{deviceId:this.videoInpSelected? {exact:this.videoInpSelected}:undefined}
-      }  
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    const deviceInfo = await this.gotStream(stream);
-    this.getDevices();
-    }catch(e){
-      console.log(e);
-    }
-    
   }
 
-  gotStream(stream:any){
+  async start() {
+
+    console.log("Inside start");
+    try {
+      console.log(this.videoInpSelected);
+      console.log(this.audioInpSelected);
+      var a = 10;
+      console.log("not hd", a);
+
+      var widthHeight: any = { width: { exact: 720 }, height: { exact: 640 }, aspectRatio: { 4: 3 } }
+      if (this.isHD) {
+        a = 15;
+        console.log("when hd", a);
+        widthHeight = { width: { ideal: 1080 }, height: { ideal: 720 }, aspectRatio: { 16: 9 } }
+
+      }
+      console.log("after hd", a);
+      const constraints = {
+        audio: { deviceId: this.audioInpSelected ? { exact: this.audioInpSelected } : undefined },
+        video: { deviceId: this.videoInpSelected ? { exact: this.videoInpSelected } : undefined, width: widthHeight.width, height: widthHeight.height, frameRate: 30 }
+
+      }
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const deviceInfo = await this.gotStream(this.stream);
+      const audioContext = new AudioContext();
+      const analyserNode = audioContext.createAnalyser();
+      const mediaStreamAudioSourceNode = audioContext.createMediaStreamSource(this.stream);
+      // console.log(mediaStreamAudioSourceNode.connect(analyserNode));
+      analyserNode.smoothingTimeConstant = 0.8;
+      analyserNode.fftSize = 2048;
+      mediaStreamAudioSourceNode.connect(analyserNode);
+      const onaudioprocess = (() => {
+        const array = new Uint8Array(analyserNode.frequencyBinCount);
+        analyserNode.getByteFrequencyData(array);
+        const arraySum = array.reduce((a, value) => a + value, 0);
+        // console.log(arraySum);
+        var average = arraySum / array.length;
+        // this.soundValue = Math.round(average);
+        // console.log(average);
+        // console.log(Math.round(average));
+        this.valueToColor = Math.round(average / 10);
+        // console.log(this.valueToColor);
+        window.requestAnimationFrame(onaudioprocess);
+        // return valueToColor;
+      })
+      window.requestAnimationFrame(onaudioprocess);
+
+
+      this.videoRef.srcObject.getVideoTracks().forEach((element: any) => {
+        element.enabled = !this.noVideoBtn;
+
+      });
+      this.videoRef.srcObject.getAudioTracks().forEach((element: any) => {
+        element.enabled = !this.noAudioBtn;
+        // window.requestAnimationFrame(onaudioprocess);
+
+      });
+
+    } catch (e) {
+      console.log(e);
+    }
+
+  }
+
+
+  gotStream(stream: any) {
     console.log(this.videoRef);
     this.videoRef.srcObject = stream;
     console.log(this.videoRef.srcObject);
     return navigator.mediaDevices.enumerateDevices();
   }
 
-  handleError(error:any){
-    console.log(error.message, error.name);
-  }
-
 
   changeAudioOutput(value: any) {
     console.log(value);
-    this.audioOutSelected=value;
+    this.audioOutSelected = value;
     if (this.videoRef.srcObject) {
       this.videoRef.srcObject.getTracks().forEach((audioTrack: any) => {
         console.log(audioTrack);
@@ -294,13 +371,92 @@ export class JoinMeetingComponent implements OnInit {
     }
   }
 
-  display(){
+  display() {
     this.showAudioMessage = true;
-    this.displayValue="Playing";
   }
 
-  nodisplay(){
+  nodisplay() {
     this.showAudioMessage = false;
-    this.displayValue = "Ended"
   }
+
+  getHD(value: any) {
+    console.log(value);
+    this.isHD = !this.isHD;
+    this.start();
+  }
+
+  async shareScreen() {
+    try {
+      this.noStream=false;
+      this.screenShare = !this.screenShare;
+      console.log(this.screenShare);
+      if (this.screenShare) {
+        console.log(this.screenShare);
+        var constraints = { audio: true, video: true };
+        this.screenShareStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+        this.screenVideo.srcObject = this.screenShareStream;
+        const tracks = this.screenShareStream.getVideoTracks()
+        tracks.forEach((track:any)=>{
+          track.onended=()=>{
+            console.log("Screen stopped");
+            this.noStream = true;
+            this.screenShare=false;
+          }
+        })
+
+      } else {
+        // this.screenVideo.srcObject=null;
+        this.showStopScreenLabel = true;
+        this.stopPresenting();
+      }
+    }
+    catch (e) {
+      console.log(e);
+    }
+  }
+
+  stopPresenting() {
+    this.screenShareStream.getVideoTracks()[0].stop();
+    this.noStream = true;
+  }
+
+  noVideoStream(){
+    this.noStream=!this.noStream;
+  }
+
+  handleSuccess(stream: any) {
+    this.screenVideo.srcObject = stream;
+    if (this.screenVideo.srcObject === 'null') {
+      this.noStream = true;
+    }
+    stream.getVideoTracks()[0].addEventListener('ended', () => {
+      // this.errorMsg('The user has ended sharing the screen', error);
+      this.screenIcon.disabled = false;
+
+    });
+  }
+
+  handleError(error: any) {
+    this.errorMsg(`getDisplayMedia error: ${error.name}`, error);
+  }
+
+  errorMsg(msg: any, error: any) {
+    this.errorMessage += `<p>${msg}</p>`;
+    if (typeof error !== 'undefined') {
+      console.error(error);
+    }
+  }
+
+  noShare() {
+    this.noStream = true;
+    // this.screenVideo.style.width = '0';
+    // this.screenVideo.style.height = '0';
+    console.log("Stream ended");
+  }
+
+
+  onPlayingVideo() {
+    console.log("screen sharing started");
+  }
+
 }

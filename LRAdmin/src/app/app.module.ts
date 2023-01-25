@@ -23,6 +23,8 @@ import { SocketioService } from './socketio.service';
 import { SocketIoModule, SocketIoConfig} from 'ngx-socket-io';
 import { CommonModule } from '@angular/common';
 import { WebcamModule } from 'ngx-webcam';
+import adapter from 'webrtc-adapter';
+
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 
@@ -51,7 +53,8 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     NgSelectModule,
     SocketIoModule.forRoot(config),
     CommonModule,
-    WebcamModule
+    WebcamModule,
+    
   ],
   providers: [{provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorService, multi:true}, SocketioService],
   bootstrap: [AppComponent]

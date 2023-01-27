@@ -99,4 +99,10 @@ export class UserService{
     return this.http.get(environment.BACKENDURL+"/meetings/join-meeting?slug=" +slug);
   }
 
+  editUser(url:string){
+    console.log(url);
+    console.log(this.uid)
+    return this.http.post(environment.BACKENDURL+`/users/edit-user/${this.uid}?url=`+url, url);
+  }
+
 }

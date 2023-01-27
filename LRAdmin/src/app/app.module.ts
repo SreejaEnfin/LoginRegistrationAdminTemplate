@@ -24,6 +24,7 @@ import { SocketIoModule, SocketIoConfig} from 'ngx-socket-io';
 import { CommonModule } from '@angular/common';
 import { WebcamModule } from 'ngx-webcam';
 import adapter from 'webrtc-adapter';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
@@ -40,6 +41,7 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     ForgotPasswordComponent,
     ResetPasswordComponent,
     JoinMeetingComponent,
+    EditProfileComponent,
     
   ],
   imports: [

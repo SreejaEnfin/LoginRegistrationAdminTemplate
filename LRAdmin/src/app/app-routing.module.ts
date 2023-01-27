@@ -4,6 +4,7 @@ import { AdmindashboardComponent } from './admindashboard/admindashboard.compone
 import { AuthGuard } from './auth.guard';
 // import { ChatAppComponent } from './chat-app/chat-app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { JoinMeetingComponent } from './join-meeting/join-meeting.component';
 import { LoginComponent } from './login/login.component';
@@ -34,8 +35,10 @@ const routes: Routes = [
   },
   {
     path:'join-meeting/:slug', component:JoinMeetingComponent
+  },
+  {
+    path:'edit-profile', component:EditProfileComponent
   }
-
 ];
 
 @NgModule({

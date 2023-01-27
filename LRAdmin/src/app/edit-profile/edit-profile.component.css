@@ -1,0 +1,41 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.editSection{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.editDiv{
+    background-color: navy;
+    width: 100%;
+    padding: 20px;
+}
+
+.bodyDiv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid black;
+}
+
+.bodySection{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 120px;
+}
+
+.bodyDiv{
+    padding: 30px;
+}
+
+.imagePreviewSection{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

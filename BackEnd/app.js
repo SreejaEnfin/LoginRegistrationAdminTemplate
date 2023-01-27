@@ -17,7 +17,8 @@ const crouter = require("./routes/chats.routes")
 const { createAdapter } = require("@socket.io/redis-adapter");
 const { createClient } = require("redis");
 
-
+app.use(cors({origin:'*'}));
+app.use(bodyparser.json());
 const pubClient = createClient({ url: process.env.REDIS_URL, password:process.env.PASSWORDREDIS });
 const subClient = pubClient.duplicate();
 
@@ -25,16 +26,28 @@ Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
   io.adapter(createAdapter(pubClient, subClient));
   // io.listen(3000);
 });
+
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 const port = process.env.PORT;
 
+// app.post('/file', upload.single('file', (req, res, next)=>{
+//   const file = req.file;
+//   console.log(file.filename);
+//   if(!file){
+//     const error = new Error('Please upload a file');
+//     error.httpStatusCode = 400;
+//     return next(error);
+//   }
+//   res.send(file);
+// }))
+
 io.on('connection', (socket) => {
-  console.log(socket.id);
+  // console.log(socket.id);
 
   socket.on('join', (roomName) => {
-    console.log("joined to room:", roomName);
+    // console.log("joined to room:", roomName);
     socket.join(roomName);
     // socket.emit("join", "joined successfully");
   })

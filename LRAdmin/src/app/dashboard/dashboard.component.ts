@@ -26,6 +26,7 @@ export class DashboardComponent {
   noMeetings:boolean = false;
   filterText:string='';
   roomNamebtn:string=''
+  userImg:any;
 
   constructor(private router:Router, public authservice:AuthService, private userservice:UserService, private socketservice:SocketioService){
     
@@ -33,7 +34,8 @@ export class DashboardComponent {
 
   ngOnInit(){
     this.getUsers();
-    this.getMeetingsUser()
+    this.getMeetingsUser();
+    this.userImg = localStorage.getItem('userImage');
   }
 
   logoutUser(){
@@ -41,11 +43,13 @@ export class DashboardComponent {
     {
     localStorage.removeItem('token');
     localStorage.removeItem('adminData');
+    localStorage.removeItem('userImage');
     this.router.navigate(['/login']);
   }
   else{
     localStorage.removeItem('token');
     localStorage.removeItem('userData');
+    localStorage.removeItem('userImage');
     this.router.navigate(['/login']);
   }
   }
@@ -111,7 +115,6 @@ export class DashboardComponent {
     else{
       console.log("No pages");
     }
-   
   }
 
 }

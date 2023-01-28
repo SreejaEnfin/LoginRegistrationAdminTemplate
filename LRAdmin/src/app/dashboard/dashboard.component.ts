@@ -2,6 +2,7 @@ import { state } from '@angular/animations';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { environment } from '../environment';
 import { Meetings } from '../models/meetings.models';
 import { User } from '../models/users.models';
 import { SocketioService } from '../socketio.service';
@@ -14,105 +15,112 @@ import { UserService } from '../user.service';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
-  users!:User[];
-  page:number=1;
-  searchText:string='';
-  details!:Meetings[];
-  joinmeetingDetails:[]=[];
-  pagecount:any;
-  pages:any[]=[];
-  current:number=1;
-  changeColor:number=1;
-  noMeetings:boolean = false;
-  filterText:string='';
-  roomNamebtn:string=''
-  userImg:any;
+  users!: User[];
+  page: number = 1;
+  searchText: string = '';
+  details!: Meetings[];
+  joinmeetingDetails: [] = [];
+  pagecount: any;
+  pages: any[] = [];
+  current: number = 1;
+  changeColor: number = 1;
+  noMeetings: boolean = false;
+  filterText: string = '';
+  roomNamebtn: string = ''
+  public userDetails: any;
+  public userImgs: any;
+  public userImg:any;
+  public image:any;
 
-  constructor(private router:Router, public authservice:AuthService, private userservice:UserService, private socketservice:SocketioService){
-    
+  constructor(private router: Router, public authservice: AuthService, private userservice: UserService, private socketservice: SocketioService) {
+    this.userDetails = localStorage.getItem('userData');
+    console.log(JSON.parse(this.userDetails));
+    this.userImgs = JSON.parse(this.userDetails).image;
+    console.log(this.userImgs);
+    this.userImg = this.userImgs.split('uploads/')[1];
+    console.log(this.userImg);
+    this.image = `${environment.BACKENDURL}/users/${this.userImg}`;
   }
 
-  ngOnInit(){
+  ngOnInit() {
     this.getUsers();
     this.getMeetingsUser();
-    this.userImg = localStorage.getItem('userImage');
   }
 
-  logoutUser(){
-    if(this.authservice.HaveAccess())
-    {
-    localStorage.removeItem('token');
-    localStorage.removeItem('adminData');
-    localStorage.removeItem('userImage');
-    this.router.navigate(['/login']);
-  }
-  else{
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('userImage');
-    this.router.navigate(['/login']);
-  }
+
+  logoutUser() {
+    if (this.authservice.HaveAccess()) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('adminData');
+      // localStorage.removeItem('userImage');
+      this.router.navigate(['/login']);
+    }
+    else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+      // localStorage.removeItem('userImage');
+      this.router.navigate(['/login']);
+    }
   }
 
-  getUsers(){
-    this.userservice.getUserList().subscribe((res:any)=>{
-      this.users=res.data.finalData;
+  getUsers() {
+    this.userservice.getUserList().subscribe((res: any) => {
+      this.users = res.data.finalData;
       console.log(res.data);
-    },(err)=>{
+    }, (err) => {
       console.log("error in getting user list");
     })
   }
 
-  getMeetingsUser(){
+  getMeetingsUser() {
     console.log("Hi");
-    this.noMeetings=false;
-    this.userservice.fillDetails(this.page).subscribe((res:any)=>{
+    this.noMeetings = false;
+    this.userservice.fillDetails(this.page).subscribe((res: any) => {
       this.details = res.data.finalData;
       this.pagecount = res.data.pageCount;
       this.pages = res.pageDown;
       console.log(res.data.finalData);
       console.log(this.details);
-      if(this.details.length === 0){
-        this.noMeetings=true;
+      if (this.details.length === 0) {
+        this.noMeetings = true;
       }
-    }, (err)=>{
+    }, (err) => {
       console.log(err);
     })
   }
 
-  joinBtn(slug:string){
+  joinBtn(slug: string) {
     console.log(slug);
-    this.userservice.urlSlug=slug;
-      this.router.navigate([`/join-meeting/${slug}`]);
+    this.userservice.urlSlug = slug;
+    this.router.navigate([`/join-meeting/${slug}`]);
   }
 
-  pageChange(i:any){
+  pageChange(i: any) {
     console.log(i);
     this.current = i;
-    this.changeColor=i;
+    this.changeColor = i;
     this.userservice.searchDetails(this.searchText, i, this.filterText).subscribe((res: any) => {
       console.log(res.data.finalData);
       this.details = res.data.finalData;
     });
   }
 
-  Nextpage(){ 
-    if(this.current < this.pages.length)
-    {
+  Nextpage() {
+    if (this.current < this.pages.length) {
       this.current++;
       this.pageChange(this.current);
-    }else{
+    } else {
       console.log("No pages");
     }
-    
+
   }
 
-  Previouspage(){
-    if(this.current > 1){
+  Previouspage() {
+    if (this.current > 1) {
       this.current--;
       this.pageChange(this.current);
     }
-    else{
+    else {
       console.log("No pages");
     }
   }

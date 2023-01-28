@@ -10,11 +10,12 @@ const ejs = require('ejs');
 const objectId = require('mongoose').Types.ObjectId;
 const emailService = require("../utils/sendEmail");
 const multer = require('multer');
+const app = express();
 
 // let upload = multer({dest:'uploads/'})
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, 'uploads');
+        callback(null, 'public/uploads');
     },
     filename: (req, file, callback) => {
         callback(null, `IMG_${file.originalname}`);
@@ -22,6 +23,12 @@ const storage = multer.diskStorage({
 })
 
 var upload = multer({ storage: storage });
+
+urouter.use('/', express.static('public/uploads'));
+// urouter.get('/public/uploads', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, 'public/uploads/', 'index.html'));
+// });
+// app.use(express.static('public'))
 
 // yup validation
 
@@ -93,7 +100,8 @@ urouter.post('/login', async (req, res) => {
                     _id: result._id,
                     email: result.uemail,
                     name: result.ufname,
-                    role: result.urole
+                    role: result.urole,
+                    image: result.imgUrl
                 }
                 let token = jwt.sign(payload, process.env.SECRET_KEY);
                 res.status(200).json({
@@ -300,34 +308,48 @@ urouter.post('/edit-user/:id', async (req, res) => {
     }
 })
 
-urouter.post('/file/:id', upload.single('file'), async(req, res) => {
+urouter.post('/file/:id', upload.single('file'), async (req, res) => {
     try {
         const file = req.file;
-        if (objectId.isValid(req.params.id)) {
-            console.log("hi in Image upload");
-            console.log(req.params.id);
-            console.log(file.filename);
-            if (!file) {
-                throw new Error("No image");
-            }
-            else {
-                // res.send(file);
-                const newUser = {
-                    imgUrl: file.path
+        console.log(file);
+        var extn = file.originalname.split('.')[1];
+        if (extn === 'jpeg' || extn === 'jpg' || extn === 'png') {
+            if (objectId.isValid(req.params.id)) {
+                console.log("hi in Image upload");
+                console.log(req.params.id);
+                console.log(file.filename);
+                if (!file) {
+                    throw new Error("No image");
                 }
-                console.log(newUser);
-                const result = await User.findByIdAndUpdate(
-                    req.params.id,
-                    { $set: newUser },
-                    { new: true });
-                res.status(200).json({
-                    message: 'Data updated',
-                    data: result,
-                    "success": true
-                });
+                else {
+                    // res.send(file);
+                    const newUser = {
+                        imgUrl: file.path
+                    }
+                    console.log(newUser);
+                    const result = await User.findByIdAndUpdate(
+                        req.params.id,
+                        { $set: newUser },
+                        { new: true });
+                    let payload = {
+                        _id: result._id,
+                        email: result.uemail,
+                        name: result.ufname,
+                        role: result.urole,
+                        image: result.imgUrl
+                    }
+                    let token = jwt.sign(payload, process.env.SECRET_KEY);
+                    res.status(200).json({
+                        message: 'Data updated',
+                        data: token,
+                        "success": true
+                    });
+                }
+            } else {
+                throw new Error("Id not valid");
             }
         } else {
-            throw new Error("Id not valid");
+            throw new Error("Image not in required format");
         }
     } catch (e) {
         console.log(e);

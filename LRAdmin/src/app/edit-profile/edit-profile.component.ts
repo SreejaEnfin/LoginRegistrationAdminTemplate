@@ -4,6 +4,8 @@ import { UserService } from '../user.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { environment } from '../environment';
 
 @Component({
   selector: 'app-edit-profile',
@@ -12,20 +14,31 @@ import { AuthService } from '../auth.service';
 })
 export class EditProfileComponent {
   newtokenData: any;
-
-  constructor(private userservice: UserService, private http: HttpClient, private router: Router, private authservice:AuthService) { }
-
+  upoadEnable: boolean = false;
+  showPreview: boolean = false;
+  editProfileForm!: FormGroup;
+  public userDetails: any;
+  public userImgs: any;
+  public userImg: any;
   public userId = '';
   imageUrl = '';
+
+  constructor(private userservice: UserService, private http: HttpClient, private router: Router, public authservice: AuthService, private fb: FormBuilder) {
+  }
   ngOnInit() {
     this.userId = this.userservice.uid;
     console.log(this.userId);
+    this.editProfileForm = this.fb.group({
+      fname: ['', [Validators.required]],
+      lname: ['', [Validators.required]]
+    })
   }
-
   url: string = '';
   imgSubmit: boolean = false;
   images: any;
-  onlyWhenImage: boolean = false;
+  public image:any;
+  public uname:any;
+  timestamp:any;
 
   onSelectImage(event: any) {
     console.log(event);
@@ -34,60 +47,74 @@ export class EditProfileComponent {
       var reader = new FileReader();
       const file = event.target.files[0];
       this.images = file;
-      reader.readAsDataURL(event.target.files[0]);
-      reader.onload = (e: any) => {
-        this.url = e.target.result;
-        console.log(this.url);
+      console.log(this.images);
+      console.log(this.images.size);
+      this.url = '';
+      if (this.images.size < 1048576 && (this.images.type === 'image/jpeg' || this.images.type === 'image/jpg' || this.images.type === 'image/png')) {
+        // check size and type here and also no .files
+        this.upoadEnable = true;
+        this.showPreview = true;
+        reader.readAsDataURL(event.target.files[0]);
+        reader.onload = (e: any) => {
+          this.url = e.target.result;
+          console.log(this.url);
+        }
+      }
+      else {
+        this.url = '';
+        this.upoadEnable = false;
+        this.showPreview = false;
       }
     }
   }
 
-  imgUpload() {
+   imgUpload() {
     console.log(this.url);
     const formData = new FormData();
     formData.append('file', this.images);
-    var extn = this.url.split('/')[1];
-    console.log(extn);
-    var imgextn = extn.split(';')[0];
-    console.log(imgextn);
-    if (imgextn === 'jpg' || imgextn === 'jpeg' || imgextn === 'png') {
-      this.onlyWhenImage = true;
-      this.http.post<any>(`http://localhost:3000/users/file/${this.userId}`, formData).subscribe((res) => {
-        console.log(res);
-        // this.imageUrl = res.data.imgUrl
-        // console.log(this.imageUrl);
-        // localStorage.setItem('userImage', this.url);
-        this.url = '';
-
-        this.newtokenData = res.data;
-        console.log(this.newtokenData)
-        // getting details from token
-        var extractedToken = this.newtokenData.split('.')[1];
-        console.log(extractedToken);
-        var atobData = atob(extractedToken);
-        console.log(atobData);
-        var parsedToken = JSON.parse(atobData);
-        console.log(parsedToken);
-
-
-        if (parsedToken.email === 'admin@gmail.com') {
-          localStorage.removeItem('token');
-          localStorage.removeItem('adminData')
-          localStorage.setItem('token', this.newtokenData)
-          localStorage.setItem('adminData', atobData);
-        }
-        else {
-          localStorage.removeItem('token');
-          localStorage.removeItem('userData')
-          localStorage.setItem('token', this.newtokenData)
-          localStorage.setItem('userData', atobData);
-        }
-      }, (err) => {
-        console.log(err);
-      });
-    } else {
-      alert("please check the format of image");
-    }
+    const firstName = this.editProfileForm.value.fname;
+    const lastName = this.editProfileForm.value.lname;
+    this.http.post<any>(environment.BACKENDURL + "/users/file/?id=" + this.userId + "&fname=" + firstName + "&lname=" + lastName, formData).subscribe(async (res) => {
+      console.log(res);
+      this.url = '';
+      this.showPreview = false;
+      this.editProfileForm.reset();
+      this.newtokenData = res.data;
+      console.log(this.newtokenData)
+      var extractedToken = this.newtokenData.split('.')[1];
+      console.log(extractedToken);
+      var atobData = atob(extractedToken);
+      console.log(atobData);
+      var parsedToken = JSON.parse(atobData);
+      console.log(parsedToken);
+      if (parsedToken.email === 'admin@gmail.com') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminData')
+        localStorage.setItem('token', this.newtokenData)
+        localStorage.setItem('adminData', atobData);
+      }
+      else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData')
+        localStorage.setItem('token', this.newtokenData)
+        localStorage.setItem('userData', atobData);
+      }
+      // this.userservice.getDetails();
+      this.userDetails =  localStorage.getItem('userData');
+      console.log(JSON.parse(this.userDetails));
+      this.userImgs = await JSON.parse(this.userDetails).image;
+      console.log(this.userImgs);
+      this.userImg =  this.userImgs.split('uploads/')[1];
+      console.log(this.userImg);
+      // this.image = `${environment.BACKENDURL}/users/${this.userImg}`;
+       this.timestamp = Date.now();
+      this.image = environment.BACKENDURL+"/users/"+this.userImg+"?q="+this.timestamp;
+      this.userservice.uimage = this.image;
+      this.uname = JSON.parse(this.userDetails).name;
+      this.userservice.uname = this.uname;
+    }, (err) => {
+      console.log(err);
+    });
   }
 
   logoutUser() {

@@ -22,6 +22,11 @@ export class UserService{
   public adminData:any;
   public name:string=''
   public uid:any;
+  public userDetails:any;
+  public userImgs:any;
+  public userImg:any;
+  public uimage:any;
+  public uname:any;
 
   
   constructor(private http:HttpClient, private socketservice:SocketioService) { 
@@ -38,6 +43,15 @@ export class UserService{
     if(adata){
       this.adminData = JSON.parse(adata);
     }
+    this.userDetails = localStorage.getItem('userData');
+    console.log(JSON.parse(this.userDetails));
+    this.userImgs = JSON.parse(this.userDetails).image;
+    console.log(this.userImgs);
+    this.userImg = this.userImgs.split('uploads/')[1];
+    console.log(this.userImg);
+    // this.uimage = `${environment.BACKENDURL}/users/${this.userImg}`;
+    this.uimage = environment.BACKENDURL+"/users/"+this.userImg+"?q="+Date.now();
+    this.uname = JSON.parse(this.userDetails).name;
   }
 
 // user
@@ -103,6 +117,10 @@ export class UserService{
     console.log(url);
     console.log(this.uid)
     return this.http.post(environment.BACKENDURL+`/users/edit-user/${this.uid}?url=`+url, url);
+  }
+
+  sendEditDetails(uid:any, editForm:any, formData:any){
+    return this.http.post(environment.BACKENDURL+"/users/file/?id="+uid, editForm, formData)
   }
 
 }

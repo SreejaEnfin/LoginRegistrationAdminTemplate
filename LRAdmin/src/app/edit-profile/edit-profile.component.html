@@ -1,20 +1,32 @@
-<section class="editSection">
-    <div class="editDiv">
-        <p class="h2 text-light text-center">Edit Profile</p>
-        <p class="h5 text-light text-end me-5" style="cursor: pointer;" (click)="logoutUser()">Logout</p>
-    </div>
-</section>
+<app-user-header></app-user-header>
 
 <section class="bodySection">
     <div class="bodyDiv">
-        <form >
-        <input type="file" (change)="onSelectImage($event)">
-        <br/>
-        <button type="submit" class="btn btn-secondary px-3 py-2" (click)="imgUpload()">Upload</button>
-    </form>
+        <form [formGroup]="editProfileForm">
+            <div class="form-group">
+                <label for="firstName"><b class="textstyle">First Name</b></label>
+                <input type="text" class="form-control p-2" formControlName="fname" placeholder="Enter First Name">
+            </div>
+            <br>
+            <div class="form-group">
+                <label for="lastName"><b class="textstyle">Last Name</b></label>
+                <input type="text" class="form-control p-2" formControlName="lname" placeholder="Enter Last Name">
+            </div>
+            <br>
+            <div class="d-flex flex-row">
+                <div class="form-group">
+                    <label for="profilePicture"><b class="textstyle">Select an Image</b> &nbsp; &nbsp;</label>
+                    <input type="file" (change)="onSelectImage($event)">
+                </div>
+                <div class="imagePreviewSection mt-5" [class.d-none]="!showPreview"
+                    [class.d-inline-block]="showPreview">
+                    <img [src]="url" height="200" width="300">
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <button type="submit" class="btn btn-primary w-100 py-2" (click)="imgUpload()"
+                    [disabled]="!upoadEnable">Submit</button>
+            </div>
+        </form>
     </div>
-</section>
-
-<section class="imagePreviewSection mt-5" [class.d-none]="!imgSubmit" [class.d-inline-block]="imgSubmit">
-    <img [src]="url" height="500" width="600" [class.d-none]="onlyWhenImage">
 </section>

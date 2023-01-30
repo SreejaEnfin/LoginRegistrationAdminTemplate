@@ -1,0 +1,14 @@
+<div class=" d-flex justify-content-between bg-primary p-3">
+    <!-- Page Heading -->
+    <div>
+        <h1 class="h3  mt-4 text-light">Hi {{this.userservice.uname}}</h1>
+    </div>
+    <div class="dropdown">
+        <img class="btn btn-light p-2 dropdown-toggle  dropdown-item dpImg" id="dropdownMenuButton"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" [src]="this.userservice.uimage" />
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" routerLink="/edit-profile">Edit Profile</a>
+            <a class="dropdown-item" routerLink="/login" (click)="logoutUser()">Logout</a>
+        </div>
+    </div>
+</div>

@@ -10,7 +10,10 @@ const ejs = require('ejs');
 const objectId = require('mongoose').Types.ObjectId;
 const emailService = require("../utils/sendEmail");
 const multer = require('multer');
-const app = express();
+const verifyToken = require("../utils/verifyToken");
+const imgpath = require('node:path');
+
+
 
 // let upload = multer({dest:'uploads/'})
 const storage = multer.diskStorage({
@@ -18,7 +21,12 @@ const storage = multer.diskStorage({
         callback(null, 'public/uploads');
     },
     filename: (req, file, callback) => {
-        callback(null, `IMG_${file.originalname}`);
+        // callback(null, `IMG_${file.originalname}`);
+        const extn = imgpath.extname(file.originalname);
+        console.log(extn);
+        callback(null, `IMG_${req.query.id}${extn}`);
+        // no need of original name, instead userid+e
+        // no need of original name, instead userid+extension (call verifyToken)
     }
 })
 
@@ -281,42 +289,43 @@ urouter.put('/:id', async (req, res) => {
 
 })
 
-urouter.post('/edit-user/:id', async (req, res) => {
-    try {
-        if (objectId.isValid(req.params.id)) {
-            let user = {
-                imgUrl: req.query.url,
-            }
-            const url = req.body.imgUrl;
-            console.log(req.params.id);
-            console.log(req.query.url);
-            const result = await User.findByIdAndUpdate(
-                req.params.id,
-                { $set: user },
-                { new: true });
-            res.status(200).json({
-                message: 'Data updated',
-                data: result,
-                "success": true,
-            });
-        }
-        else {
-            throw new Error("Id not valid");
-        }
-    } catch (e) {
-        console.log(e);
-    }
-})
+// urouter.post('/edit-user/:id', async (req, res) => {
+//     try {
+//         if (objectId.isValid(req.params.id)) {
+//             let user = {
+//                 imgUrl: req.query.url,
+//             }
+//             const url = req.body.imgUrl;
+//             console.log(req.params.id);
+//             console.log(req.query.url);
+//             const result = await User.findByIdAndUpdate(
+//                 req.params.id,
+//                 { $set: user },
+//                 { new: true });
+//             res.status(200).json({
+//                 message: 'Data updated',
+//                 data: result,
+//                 "success": true,
+//             });
+//         }
+//         else {
+//             throw new Error("Id not valid");
+//         }
+//     } catch (e) {
+//         console.log(e);
+//     }
+// })
 
-urouter.post('/file/:id', upload.single('file'), async (req, res) => {
+urouter.post('/file', verifyToken,upload.single('file'), async (req, res) => {
     try {
         const file = req.file;
         console.log(file);
-        var extn = file.originalname.split('.')[1];
-        if (extn === 'jpeg' || extn === 'jpg' || extn === 'png') {
-            if (objectId.isValid(req.params.id)) {
+        const extn = imgpath.extname(file.originalname);
+        // use path.extname for getting extension, also check size (below 1mb)
+        if (extn === '.jpeg' || extn === '.jpg' || extn === '.png') {
+            if (objectId.isValid(req.query.id)) {
                 console.log("hi in Image upload");
-                console.log(req.params.id);
+                console.log(req.query.id);
                 console.log(file.filename);
                 if (!file) {
                     throw new Error("No image");
@@ -324,11 +333,13 @@ urouter.post('/file/:id', upload.single('file'), async (req, res) => {
                 else {
                     // res.send(file);
                     const newUser = {
+                        ufname:req.query.fname,
+                        ulname:req.query.lname,
                         imgUrl: file.path
                     }
                     console.log(newUser);
                     const result = await User.findByIdAndUpdate(
-                        req.params.id,
+                        req.query.id,
                         { $set: newUser },
                         { new: true });
                     let payload = {

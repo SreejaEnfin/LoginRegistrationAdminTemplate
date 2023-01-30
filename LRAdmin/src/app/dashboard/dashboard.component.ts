@@ -29,17 +29,10 @@ export class DashboardComponent {
   roomNamebtn: string = ''
   public userDetails: any;
   public userImgs: any;
-  public userImg:any;
-  public image:any;
+  public userImg: any;
+  public image: any;
 
   constructor(private router: Router, public authservice: AuthService, private userservice: UserService, private socketservice: SocketioService) {
-    this.userDetails = localStorage.getItem('userData');
-    console.log(JSON.parse(this.userDetails));
-    this.userImgs = JSON.parse(this.userDetails).image;
-    console.log(this.userImgs);
-    this.userImg = this.userImgs.split('uploads/')[1];
-    console.log(this.userImg);
-    this.image = `${environment.BACKENDURL}/users/${this.userImg}`;
   }
 
   ngOnInit() {

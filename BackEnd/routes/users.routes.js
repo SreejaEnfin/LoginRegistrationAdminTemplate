@@ -20,6 +20,9 @@ const storage = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, 'public/uploads');
     },
+    limits: {
+        fileSize: 1000000
+    },
     filename: (req, file, callback) => {
         // callback(null, `IMG_${file.originalname}`);
         const extn = imgpath.extname(file.originalname);
@@ -316,7 +319,7 @@ urouter.put('/:id', async (req, res) => {
 //     }
 // })
 
-urouter.post('/file', verifyToken,upload.single('file'), async (req, res) => {
+urouter.post('/file', verifyToken, upload.single('file'), async (req, res) => {
     try {
         const file = req.file;
         console.log(file);
@@ -333,8 +336,8 @@ urouter.post('/file', verifyToken,upload.single('file'), async (req, res) => {
                 else {
                     // res.send(file);
                     const newUser = {
-                        ufname:req.query.fname,
-                        ulname:req.query.lname,
+                        ufname: req.query.fname,
+                        ulname: req.query.lname,
                         imgUrl: file.path
                     }
                     console.log(newUser);
